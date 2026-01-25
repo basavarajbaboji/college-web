@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Contact Government Polytechnic College Hole Alur.">
+    <title>Contact Us | Government Polytechnic College Hole Alur</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="margin: 0;">Government Polytechnic College Hole Alur</h1>
+                <nav style="position: relative;">
+                    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="branches.html">Branches</a></li>
+                        <li><a href="admissions.html">Admissions</a></li>
+                        <li><a href="faculty.html">Faculty</a></li>
+                        <li><a href="student_details.html">Student Details</a></li>
+                        <li><a href="contact.html" aria-current="page">Contact Us</a></li>
+                        <li><a href="admin.html">Admin</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="contact" class="section">
+            <div class="container">
+                <h2>📬 Contact Us</h2>
+                <p style="text-align: center; color: var(--gray-600); max-width: 600px; margin: 0 auto 2rem;">
+                    Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                </p>
+
+                <form id="contactForm">
+                    <div style="margin-bottom: 1rem;">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your full name" required />
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email address" required />
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <label for="message">Your Message</label>
+                        <textarea id="message" name="message" rows="5" placeholder="Write your message here..."
+                            required></textarea>
+                    </div>
+
+                    <button type="submit">Send Message →</button>
+                </form>
+
+                <div id="formResponse" style="margin-top: 1rem; text-align: center;"></div>
+
+                <!-- Social Media Links -->
+                <div style="margin-top: 2rem; text-align: center;">
+                    <h3 style="color: var(--gray-700); margin-bottom: 1rem;">Follow Us</h3>
+                    <ul class="social-media-links">
+                        <li><a href="https://www.instagram.com/gpcholealur" target="_blank" rel="noopener">📸
+                                Instagram</a></li>
+                        <li><a href="https://www.facebook.com/gpcholealur" target="_blank" rel="noopener">👥
+                                Facebook</a></li>
+                        <li><a href="https://twitter.com/gpcholealur" target="_blank" rel="noopener">🐦 Twitter</a></li>
+                        <li><a href="https://www.linkedin.com/school/gpcholealur" target="_blank" rel="noopener">💼
+                                LinkedIn</a></li>
+                    </ul>
+                </div>
+
+                <!-- Map and Hours Section -->
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem;">
+                    <!-- Google Maps Embed (Placeholder for location) -->
+                    <div
+                        style="border-radius: 12px; overflow: hidden; height: 300px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15366.195616053!2d75.68!3d15.75!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTVCsDQ1JzAwLjAiTiA3NcKwNDAnNDguMCJF!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin"
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+
+                    <!-- Office Hours Card -->
+                    <div
+                        style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--primary-blue);">
+                        <h3 style="color: var(--primary-blue); margin-bottom: 1rem;">⏰ Office Hours</h3>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <div
+                                style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem;">
+                                <span style="font-weight: 600;">Mon - Fri:</span>
+                                <span>10:00 AM - 5:30 PM</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem;">
+                                <span style="font-weight: 600;">Saturday:</span>
+                                <span>10:00 AM - 1:30 PM</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: #dc2626;">
+                                <span style="font-weight: 600;">Sunday:</span>
+                                <span>Closed (Holiday)</span>
+                            </div>
+                        </div>
+                        <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--gray-600); font-style: italic;">
+                            *Note: Administrative office remains closed on 2nd and 4th Saturdays.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Contact Info Cards -->
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 2rem;">
+                    <div class="info-card">
+                        <h3>📍 Address</h3>
+                        <p data-db-field="address">Government Polytechnic College<br />Hole Alur, Karnataka, India</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>📞 Phone</h3>
+                        <p data-db-field="phone">+91-12345-67890</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>📧 Email</h3>
+                        <p><a href="mailto:info@gpcholealur.edu.in" style="color: var(--primary-blue);"
+                                data-db-field="email">info@gpcholealur.edu.in</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 Government Polytechnic College Hole Alur. All rights reserved.</p>
+            <p>Gifted by BASAVARAJ BABOJI GANOJI</p>
+        </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+
+</html>

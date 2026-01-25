@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Login | Government Polytechnic College Hole Alur</title>
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="margin: 0;">Government Polytechnic College Hole Alur</h1>
+                <nav style="position: relative;">
+                    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="/index.html">Home</a></li>
+                        <li><a href="/branches.html">Branches</a></li>
+                        <li><a href="/admissions.html">Admissions</a></li>
+                        <li><a href="/faculty.html">Faculty</a></li>
+                        <li><a href="/student_details.html">Student Details</a></li>
+                        <li><a href="/contact.html">Contact Us</a></li>
+                        <li><a href="/admin/login" aria-current="page">Admin Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main style="min-height: 60vh; display: flex; align-items: center; justify-content: center; padding: 3rem 1rem;">
+        <div class="section" style="max-width: 450px; width: 100%;">
+            <h2 style="margin-bottom: 1.5rem;">🔐 Admin Login</h2>
+
+            <form id="loginForm" method="POST" action="/admin/login">
+                <div style="margin-bottom: 1rem;">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required
+                        autocomplete="username" />
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required
+                        autocomplete="current-password" />
+                </div>
+
+                <button type="submit">Login →</button>
+            </form>
+
+            <div id="loginMessage" style="margin-top: 1rem; text-align: center; color: #ea580c;"></div>
+
+            <div style="margin-top: 1.5rem; text-align: center; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                <p style="color: #6b7280; font-size: 0.9rem;">
+                    Protected area for administrators only.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 Government Polytechnic College Hole Alur. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/script.js" defer></script>
+</body>
+
+</html>

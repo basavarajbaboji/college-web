@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description"
+        content="Explore diploma programs in AI, Computer Science, Electrical, and Electronics Engineering at Government Polytechnic College Hole Alur.">
+    <title>Branches | Government Polytechnic College Hole Alur</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="margin: 0;">Government Polytechnic College Hole Alur</h1>
+                <nav style="position: relative;">
+                    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="branches.html" aria-current="page">Branches</a></li>
+                        <li><a href="admissions.html">Admissions</a></li>
+                        <li><a href="faculty.html">Faculty</a></li>
+                        <li><a href="student_details.html">Student Details</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="admin.html">Admin</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="branches" class="section">
+            <div class="container">
+                <h2>🎓 Our Branches</h2>
+                <p style="text-align: center; color: var(--gray-600); max-width: 800px; margin: 0 auto 2rem;">
+                    Government Polytechnic College Hole Alur offers cutting-edge diploma programs in various engineering
+                    disciplines. Our curriculum is designed to provide students with a strong foundation in both
+                    theoretical concepts and practical applications.
+                </p>
+
+                <ul id="branchList" class="branches-list">
+                    <li>
+                        <h3>Loading branch data...</h3>
+                        <p>Please wait while we fetch the latest information.</p>
+                    </li>
+                </ul>
+
+                <div
+                    style="margin-top: 2rem; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 1px solid var(--gray-200);">
+                    <h3 style="color: var(--accent-green);">✓ Industry-Ready Curriculum</h3>
+                    <p style="color: var(--gray-600);">
+                        All our programs are affiliated with the Department of Technical Education, Karnataka, and
+                        follow the latest industry standards. Students gain hands-on experience through workshops,
+                        projects, and industry internships.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 Government Polytechnic College Hole Alur. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const branchList = document.getElementById('branchList');
+
+            fetch('/api/branches')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to fetch');
+                    return response.json();
+                })
+                .then(data => {
+                    const branches = data.branches || [];
+                    if (branches.length === 0) {
+                        branchList.innerHTML = '<li><h3>No branch information available.</h3></li>';
+                        return;
+                    }
+
+                    const icons = {
+                        'Artificial Intelligence': '🧠',
+                        'Computer Science Engineering': '💻',
+                        'Electrical and Electronics Engineering': '⚡',
+                        'Electronics and Communication Engineering': '📡',
+                        'Mechanical Engineering': '🔧',
+                        'Civil Engineering': '🎯'
+                    };
+
+                    branchList.innerHTML = '';
+                    branches.forEach((branch, index) => {
+                        const li = document.createElement('li');
+                        li.style.animationDelay = `${index * 0.1}s`;
+                        li.className = 'branch-card';
+
+                        const icon = icons[branch.name] || '🎯';
+
+                        li.innerHTML = `
+                            <div class="branch-summary" style="cursor: pointer; padding: 10px; transition: background 0.3s;" onclick="toggleBranchDetails(this)">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <h3 style="margin: 0; color: var(--primary-blue);" data-db-field="name" data-db-index="${index}">${icon} ${branch.name}</h3>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <p style="margin-top: 10px; color: var(--gray-600);" data-db-field="description" data-db-index="${index}">${branch.description}</p>
+                            </div>
+                            <div class="branch-extra-details" style="display: none; padding: 1.5rem; border-top: 1px solid var(--gray-200); background: #f8fafc; border-radius: 0 0 12px 12px; animation: slideDown 0.3s ease-out;">
+                                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                                    <div style="background: white; padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--primary-blue); color: var(--primary-blue); font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                                        ⏳ Duration: <span data-db-field="duration" data-db-index="${index}">${branch.duration || '3 Years'}</span>
+                                    </div>
+                                    <div style="background: white; padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--accent-orange); color: var(--accent-orange); font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                                        🎓 Eligibility: <span data-db-field="eligibility" data-db-index="${index}">${branch.eligibility || 'SSLC Pass'}</span>
+                                    </div>
+                                    <div style="background: white; padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--accent-purple); color: var(--accent-purple); font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                                        👥 Intake: <span data-db-field="intake" data-db-index="${index}">${branch.intake || '60'}</span> Seats
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 1.5rem; background: rgba(59, 130, 246, 0.05); padding: 1rem; border-radius: 8px; border: 1px dashed var(--primary-blue);">
+                                    <h4 style="color: var(--primary-blue); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        🔬 Specialized Laboratories
+                                    </h4>
+                                    <p style="font-size: 0.9rem; color: var(--gray-700);" data-db-field="labs" data-db-index="${index}">${branch.labs || 'State-of-the-art Departmental Labs'}</p>
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <h4 style="color: var(--accent-orange); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        📚 Core Subjects
+                                    </h4>
+                                    <p style="color: var(--gray-700); font-size: 0.95rem; line-height: 1.6;" data-db-field="core_subjects" data-db-index="${index}">${branch.core_subjects || 'Information coming soon...'}</p>
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <h4 style="color: var(--accent-purple); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        🛠️ Key Skills Learned
+                                    </h4>
+                                    <p style="color: var(--gray-700); font-size: 0.95rem; line-height: 1.6;" data-db-field="key_skills" data-db-index="${index}">${branch.key_skills || 'Information coming soon...'}</p>
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <h4 style="color: #6366f1; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        🚀 Future Technology
+                                    </h4>
+                                    <p style="color: var(--gray-700); font-size: 0.95rem; line-height: 1.6;" data-db-field="future_tech" data-db-index="${index}">${branch.future_tech || 'Information coming soon...'}</p>
+                                </div>
+                                <div>
+                                    <h4 style="color: var(--accent-green); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        🌍 Industry Usage (Current Level)
+                                    </h4>
+                                    <p style="color: var(--gray-700); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem;" data-db-field="current_usage" data-db-index="${index}">${branch.current_usage || 'Information coming soon...'}</p>
+                                </div>
+                                <div style="background: rgba(59, 130, 246, 0.05); padding: 1rem; border-radius: 8px;">
+                                    <h4 style="color: var(--primary-blue); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        💼 Career Opportunities
+                                    </h4>
+                                    <p style="color: var(--gray-700); font-size: 0.95rem; font-weight: 500;" data-db-field="career_roles" data-db-index="${index}">
+                                        ${branch.career_roles || 'Coming soon...'}
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                        branchList.appendChild(li);
+                    });
+                })
+                .catch((err) => {
+                    console.error(err);
+                    branchList.innerHTML = '<li><h3 style="color: var(--accent-orange);">Failed to load branch data.</h3></li>';
+                });
+        });
+
+        function toggleBranchDetails(element) {
+            const extra = element.nextElementSibling;
+            const toggleIcon = element.querySelector('.toggle-icon');
+            const card = element.parentElement;
+
+            if (extra.style.display === 'none' || !extra.style.display) {
+                extra.style.display = 'block';
+                toggleIcon.innerText = '▲';
+                toggleIcon.style.color = 'var(--primary-blue)';
+                card.style.borderColor = 'var(--primary-blue)';
+                card.style.boxShadow = 'var(--shadow-lg)';
+            } else {
+                extra.style.display = 'none';
+                toggleIcon.innerText = '▼';
+                toggleIcon.style.color = 'inherit';
+                card.style.borderColor = 'var(--gray-200)';
+                card.style.boxShadow = 'var(--shadow-md)';
+            }
+        }
+    </script>
+</body>
+
+</html>

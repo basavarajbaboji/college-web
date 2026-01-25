@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description"
+        content="Apply for diploma admission at Government Polytechnic College Hole Alur - Karnataka DTE Admission 2026">
+    <title>Admissions & Apply Online | Government Polytechnic College Hole Alur</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        /* Application Form Specific Styles */
+        .apply-hero {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            padding: 3rem 2rem;
+            border-radius: 16px;
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .apply-hero::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -50px;
+            right: -50px;
+        }
+
+        .apply-hero h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .apply-hero p {
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .apply-btn {
+            background: white;
+            color: #1e40af;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .apply-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .apply-btn.active {
+            background: #059669;
+            color: white;
+        }
+
+        /* Form Container */
+        #applicationFormContainer {
+            display: none;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        #applicationFormContainer.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Form Steps */
+        .form-step {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .form-step:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .form-step.completed {
+            border-color: #059669;
+            background: linear-gradient(135deg, rgba(5, 150, 105, 0.02) 0%, white 100%);
+        }
+
+        .form-step.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #059669;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e40af;
+            margin: 0;
+        }
+
+        .step-subtitle {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        /* Form Fields Grid */
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .field-group {
+            position: relative;
+        }
+
+        .field-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .field-group .required {
+            color: #ea580c;
+        }
+
+        .field-group input,
+        .field-group select,
+        .field-group textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus {
+            border-color: #3b82f6;
+            background: white;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .field-group input[type="file"] {
+            padding: 0.75rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, white 100%);
+            border: 2px dashed #3b82f6;
+            cursor: pointer;
+        }
+
+        .field-group input[type="file"]:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, white 100%);
+        }
+
+        .field-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Save Draft Button */
+        .step-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .save-draft-btn {
+            background: #f3f4f6;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .save-draft-btn:hover {
+            background: #e5e7eb;
+            border-color: #d1d5db;
+        }
+
+        .save-draft-btn.saved {
+            background: #d1fae5;
+            color: #059669;
+            border-color: #a7f3d0;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        /* Submit Section */
+        .submit-section {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            color: white;
+        }
+
+        .submit-section h3 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .submit-btn {
+            background: white;
+            color: #1e40af;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="margin: 0;">Government Polytechnic College Hole Alur</h1>
+                <nav style="position: relative;">
+                    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="branches.html">Branches</a></li>
+                        <li><a href="admissions.html" aria-current="page">Admissions</a></li>
+                        <li><a href="faculty.html">Faculty</a></li>
+                        <li><a href="student_details.html">Student Details</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="admin.html">Admin</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Admission Info Section -->
+        <section class="section">
+            <div class="container">
+                <h2>📋 Karnataka Diploma Admission 2026</h2>
+
+                <!-- Quick Info Cards -->
+                <div id="admissionsInfo"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                    <div
+                        style="padding: 1.5rem; background: linear-gradient(135deg, #eff6ff 0%, white 100%); border-radius: 12px; border-left: 4px solid #3b82f6; text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📅</div>
+                        <h3 style="color: var(--primary-blue); font-size: 1rem; margin-bottom: 0.25rem;">Application
+                            Period</h3>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; margin: 0;" data-db-field="dates">April -
+                            May 2026</p>
+                    </div>
+                    <div
+                        style="padding: 1.5rem; background: linear-gradient(135deg, #ecfdf5 0%, white 100%); border-radius: 12px; border-left: 4px solid #059669; text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+                        <h3 style="color: #059669; font-size: 1rem; margin-bottom: 0.25rem;">Eligibility</h3>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; margin: 0;" data-db-field="eligibility">
+                            Min. 35% in SSLC</p>
+                    </div>
+                    <div
+                        style="padding: 1.5rem; background: linear-gradient(135deg, #fef3c7 0%, white 100%); border-radius: 12px; border-left: 4px solid #f59e0b; text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎓</div>
+                        <h3 style="color: #d97706; font-size: 1rem; margin-bottom: 0.25rem;">Duration</h3>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; margin: 0;">3 Years (6 Semesters)</p>
+                    </div>
+                    <div
+                        style="padding: 1.5rem; background: linear-gradient(135deg, #fce7f3 0%, white 100%); border-radius: 12px; border-left: 4px solid #ec4899; text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">💰</div>
+                        <h3 style="color: #db2777; font-size: 1rem; margin-bottom: 0.25rem;">Fee (Approx)</h3>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; margin: 0;">₹3,000 - ₹5,000/Year</p>
+                    </div>
+                </div>
+
+                <!-- Documents Required -->
+            </div>
+
+            <!-- Admission Timeline -->
+            <div style="margin-bottom: 3rem; margin-top: 3rem;">
+                <h3 style="color: var(--primary-blue); margin-bottom: 1.5rem; text-align: center;">📅 Admission Timeline
+                    2026</h3>
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; position: relative;">
+                    <div
+                        style="background: white; padding: 1.25rem; border-radius: 12px; border: 1px solid #e5e7eb; border-top: 4px solid #3b82f6; text-align: center; box-shadow: var(--shadow-sm);">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📢</div>
+                        <h4 style="margin: 0; color: var(--primary-blue); font-size: 1rem;">Notification</h4>
+                        <p style="margin: 0.25rem 0 0; color: var(--gray-600); font-size: 0.85rem;">Early April 2026</p>
+                    </div>
+                    <div
+                        style="background: white; padding: 1.25rem; border-radius: 12px; border: 1px solid #e5e7eb; border-top: 4px solid #3b82f6; text-align: center; box-shadow: var(--shadow-sm);">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📝</div>
+                        <h4 style="margin: 0; color: var(--primary-blue); font-size: 1rem;">Application</h4>
+                        <p style="margin: 0.25rem 0 0; color: var(--gray-600); font-size: 0.85rem;">Mid April 2026</p>
+                    </div>
+                    <div
+                        style="background: white; padding: 1.25rem; border-radius: 12px; border: 1px solid #e5e7eb; border-top: 4px solid #3b82f6; text-align: center; box-shadow: var(--shadow-sm);">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔍</div>
+                        <h4 style="margin: 0; color: var(--primary-blue); font-size: 1rem;">Verification</h4>
+                        <p style="margin: 0.25rem 0 0; color: var(--gray-600); font-size: 0.85rem;">Early June 2026</p>
+                    </div>
+                    <div
+                        style="background: white; padding: 1.25rem; border-radius: 12px; border: 1px solid #e5e7eb; border-top: 4px solid #059669; text-align: center; box-shadow: var(--shadow-sm);">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🎓</div>
+                        <h4 style="margin: 0; color: #059669; font-size: 1rem;">Counselling</h4>
+                        <p style="margin: 0.25rem 0 0; color: var(--gray-600); font-size: 0.85rem;">June-July 2026</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div style="background: #eff6ff; border-radius: 12px; padding: 2rem; margin-bottom: 3rem;">
+                <h3 style="color: var(--primary-blue); margin-bottom: 1.5rem; text-align: center;">🤔 Frequently Asked
+                    Questions</h3>
+                <div id="faqContent" data-db-field="faq"
+                    style="display: flex; flex-direction: column; gap: 1rem; max-width: 800px; margin: 0 auto;">
+                    <p>Loading questions...</p>
+                </div>
+            </div>
+            </div>
+        </section>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                fetch('/admin/edit/admissions')
+                    .then(res => res.json())
+                    .then(data => {
+                        const info = data.admissions || {};
+                        if (info.dates) document.querySelector('[data-db-field="dates"]').textContent = info.dates;
+                        if (info.eligibility) document.querySelector('[data-db-field="eligibility"]').textContent = info.eligibility;
+                        if (info.faq) document.getElementById('faqContent').innerHTML = info.faq;
+                    });
+            });
+        </script>
+
+        <!-- Apply Now Section -->
+        <section class="section" id="apply-section">
+            <div class="container">
+                <!-- Apply Now Hero -->
+                <div class="apply-hero">
+                    <h2>📝 Online Application Form</h2>
+                    <p>Start your journey towards a bright future in engineering. Fill out the application form to
+                        pre-register for diploma admission.</p>
+                    <button class="apply-btn" id="applyNowBtn" onclick="toggleApplicationForm()">
+                        🚀 Apply Now
+                    </button>
+                </div>
+
+                <!-- Application Form Container (Hidden Initially) -->
+                <div id="applicationFormContainer">
+
+                    <!-- Progress Bar -->
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progressSteps">Step 0 of 5 completed</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                    </div>
+
+                    <form id="diplomaApplicationForm" enctype="multipart/form-data">
+
+                        <!-- Step 1: Candidate Information -->
+                        <div class="form-step" id="step1">
+                            <div class="step-header">
+                                <div class="step-number">1</div>
+                                <div>
+                                    <h3 class="step-title">Candidate Information</h3>
+                                    <p class="step-subtitle">Personal details as per SSLC certificate</p>
+                                </div>
+                            </div>
+
+                            <div class="fields-grid">
+                                <div class="field-group">
+                                    <label>Full Name <span class="required">*</span></label>
+                                    <input type="text" id="candidateName" name="candidateName" required
+                                        placeholder="Enter name as in SSLC" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Father's Name <span class="required">*</span></label>
+                                    <input type="text" id="fatherName" name="fatherName" required
+                                        placeholder="Enter father's name" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Mother's Name <span class="required">*</span></label>
+                                    <input type="text" id="motherName" name="motherName" required
+                                        placeholder="Enter mother's name" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Date of Birth <span class="required">*</span></label>
+                                    <input type="date" id="dob" name="dob" required />
+                                </div>
+                                <div class="field-group">
+                                    <label>Gender <span class="required">*</span></label>
+                                    <select id="gender" name="gender" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Transgender">Transgender</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Category <span class="required">*</span></label>
+                                    <select id="category" name="category" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="GM">General Merit (GM)</option>
+                                        <option value="SC">Scheduled Caste (SC)</option>
+                                        <option value="ST">Scheduled Tribe (ST)</option>
+                                        <option value="Cat-1">Category-1</option>
+                                        <option value="2A">2A</option>
+                                        <option value="2B">2B</option>
+                                        <option value="3A">3A</option>
+                                        <option value="3B">3B</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Religion <span class="required">*</span></label>
+                                    <select id="religion" name="religion" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="Hindu">Hindu</option>
+                                        <option value="Muslim">Muslim</option>
+                                        <option value="Christian">Christian</option>
+                                        <option value="Jain">Jain</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Nationality</label>
+                                    <input type="text" id="nationality" name="nationality" value="Indian" readonly />
+                                </div>
+                            </div>
+
+                            <div class="step-actions">
+                                <button type="button" class="save-draft-btn" onclick="saveDraft(1)">
+                                    💾 Save Draft
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Contact Details -->
+                        <div class="form-step" id="step2">
+                            <div class="step-header">
+                                <div class="step-number">2</div>
+                                <div>
+                                    <h3 class="step-title">Contact & Address</h3>
+                                    <p class="step-subtitle">Your contact information for communication</p>
+                                </div>
+                            </div>
+
+                            <div class="fields-grid">
+                                <div class="field-group">
+                                    <label>Mobile Number <span class="required">*</span></label>
+                                    <input type="tel" id="mobile" name="mobile" required placeholder="10-digit mobile"
+                                        pattern="[6-9][0-9]{9}" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Email Address <span class="required">*</span></label>
+                                    <input type="email" id="email" name="email" required
+                                        placeholder="your.email@example.com" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Aadhaar Number <span class="required">*</span></label>
+                                    <input type="text" id="aadharNo" name="aadharNo" required
+                                        placeholder="12-digit Aadhaar" pattern="[0-9]{12}" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Alternate Mobile</label>
+                                    <input type="tel" id="altMobile" name="altMobile"
+                                        placeholder="Parent's mobile (optional)" />
+                                </div>
+                                <div class="field-group field-full">
+                                    <label>Permanent Address <span class="required">*</span></label>
+                                    <textarea id="address" name="address" rows="2" required
+                                        placeholder="House No, Street, Village/Town"></textarea>
+                                </div>
+                                <div class="field-group">
+                                    <label>District <span class="required">*</span></label>
+                                    <select id="district" name="district" required>
+                                        <option value="">-- Select District --</option>
+                                        <option value="Bagalkot">Bagalkot</option>
+                                        <option value="Ballari">Ballari</option>
+                                        <option value="Belagavi">Belagavi</option>
+                                        <option value="Bengaluru Urban">Bengaluru Urban</option>
+                                        <option value="Bengaluru Rural">Bengaluru Rural</option>
+                                        <option value="Bidar">Bidar</option>
+                                        <option value="Chamarajanagar">Chamarajanagar</option>
+                                        <option value="Chikkaballapur">Chikkaballapur</option>
+                                        <option value="Chikkamagaluru">Chikkamagaluru</option>
+                                        <option value="Chitradurga">Chitradurga</option>
+                                        <option value="Dakshina Kannada">Dakshina Kannada</option>
+                                        <option value="Davanagere">Davanagere</option>
+                                        <option value="Dharwad">Dharwad</option>
+                                        <option value="Gadag">Gadag</option>
+                                        <option value="Hassan">Hassan</option>
+                                        <option value="Haveri">Haveri</option>
+                                        <option value="Kalaburagi">Kalaburagi</option>
+                                        <option value="Kodagu">Kodagu</option>
+                                        <option value="Kolar">Kolar</option>
+                                        <option value="Koppal">Koppal</option>
+                                        <option value="Mandya">Mandya</option>
+                                        <option value="Mysuru">Mysuru</option>
+                                        <option value="Raichur">Raichur</option>
+                                        <option value="Ramanagara">Ramanagara</option>
+                                        <option value="Shivamogga">Shivamogga</option>
+                                        <option value="Tumakuru">Tumakuru</option>
+                                        <option value="Udupi">Udupi</option>
+                                        <option value="Uttara Kannada">Uttara Kannada</option>
+                                        <option value="Vijayapura">Vijayapura</option>
+                                        <option value="Yadgir">Yadgir</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Taluk <span class="required">*</span></label>
+                                    <input type="text" id="taluk" name="taluk" required placeholder="Enter Taluk" />
+                                </div>
+                                <div class="field-group">
+                                    <label>PIN Code <span class="required">*</span></label>
+                                    <input type="text" id="pincode" name="pincode" required placeholder="6-digit PIN"
+                                        pattern="[0-9]{6}" />
+                                </div>
+                            </div>
+
+                            <div class="step-actions">
+                                <button type="button" class="save-draft-btn" onclick="saveDraft(2)">
+                                    💾 Save Draft
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: SSLC Details -->
+                        <div class="form-step" id="step3">
+                            <div class="step-header">
+                                <div class="step-number">3</div>
+                                <div>
+                                    <h3 class="step-title">SSLC / 10th Standard Details</h3>
+                                    <p class="step-subtitle">Your qualifying examination details</p>
+                                </div>
+                            </div>
+
+                            <div class="fields-grid">
+                                <div class="field-group">
+                                    <label>SSLC Register Number <span class="required">*</span></label>
+                                    <input type="text" id="sslcRegNo" name="sslcRegNo" required
+                                        placeholder="As per marks card" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Year of Passing <span class="required">*</span></label>
+                                    <select id="sslcYear" name="sslcYear" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Board <span class="required">*</span></label>
+                                    <select id="sslcBoard" name="sslcBoard" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="KSEEB">Karnataka (KSEEB)</option>
+                                        <option value="CBSE">CBSE</option>
+                                        <option value="ICSE">ICSE</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>School Name <span class="required">*</span></label>
+                                    <input type="text" id="schoolName" name="schoolName" required
+                                        placeholder="School name & place" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Total Marks <span class="required">*</span></label>
+                                    <input type="number" id="totalMarks" name="totalMarks" required min="0" max="625"
+                                        placeholder="Out of 625" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Percentage <span class="required">*</span></label>
+                                    <input type="number" id="percentage" name="percentage" required min="35" max="100"
+                                        step="0.01" placeholder="Min 35%" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Maths Marks <span class="required">*</span></label>
+                                    <input type="number" id="mathsMarks" name="mathsMarks" required min="0" max="100"
+                                        placeholder="Out of 100" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Science Marks <span class="required">*</span></label>
+                                    <input type="number" id="scienceMarks" name="scienceMarks" required min="0"
+                                        max="100" placeholder="Out of 100" />
+                                </div>
+                            </div>
+
+                            <div class="step-actions">
+                                <button type="button" class="save-draft-btn" onclick="saveDraft(3)">
+                                    💾 Save Draft
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Branch Preference -->
+                        <div class="form-step" id="step4">
+                            <div class="step-header">
+                                <div class="step-number">4</div>
+                                <div>
+                                    <h3 class="step-title">Course / Branch Preference</h3>
+                                    <p class="step-subtitle">Select your preferred engineering branches</p>
+                                </div>
+                            </div>
+
+                            <div class="fields-grid">
+                                <div class="field-group">
+                                    <label>1st Preference <span class="required">*</span></label>
+                                    <select id="pref1" name="preference1" required>
+                                        <option value="">-- Select Branch --</option>
+                                        <option value="CS">Computer Science & Engineering</option>
+                                        <option value="AI">Artificial Intelligence & ML</option>
+                                        <option value="EC">Electronics & Communication</option>
+                                        <option value="EE">Electrical & Electronics</option>
+                                        <option value="ME">Mechanical Engineering</option>
+                                        <option value="CV">Civil Engineering</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>2nd Preference</label>
+                                    <select id="pref2" name="preference2">
+                                        <option value="">-- Optional --</option>
+                                        <option value="CS">Computer Science & Engineering</option>
+                                        <option value="AI">Artificial Intelligence & ML</option>
+                                        <option value="EC">Electronics & Communication</option>
+                                        <option value="EE">Electrical & Electronics</option>
+                                        <option value="ME">Mechanical Engineering</option>
+                                        <option value="CV">Civil Engineering</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>3rd Preference</label>
+                                    <select id="pref3" name="preference3">
+                                        <option value="">-- Optional --</option>
+                                        <option value="CS">Computer Science & Engineering</option>
+                                        <option value="AI">Artificial Intelligence & ML</option>
+                                        <option value="EC">Electronics & Communication</option>
+                                        <option value="EE">Electrical & Electronics</option>
+                                        <option value="ME">Mechanical Engineering</option>
+                                        <option value="CV">Civil Engineering</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="step-actions">
+                                <button type="button" class="save-draft-btn" onclick="saveDraft(4)">
+                                    💾 Save Draft
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 5: Document Upload -->
+                        <div class="form-step" id="step5">
+                            <div class="step-header">
+                                <div class="step-number">5</div>
+                                <div>
+                                    <h3 class="step-title">Document Upload</h3>
+                                    <p class="step-subtitle">Upload scanned copies (JPG/PDF, max 200KB each)</p>
+                                </div>
+                            </div>
+
+                            <div class="fields-grid">
+                                <div class="field-group">
+                                    <label>Passport Photo <span class="required">*</span></label>
+                                    <input type="file" id="photo" name="photo" accept="image/jpeg,image/jpg" required />
+                                </div>
+                                <div class="field-group">
+                                    <label>Candidate Signature <span class="required">*</span></label>
+                                    <input type="file" id="signature" name="signature" accept="image/jpeg,image/jpg"
+                                        required />
+                                </div>
+                                <div class="field-group">
+                                    <label>Left Thumb Impression <span class="required">*</span></label>
+                                    <input type="file" id="thumb" name="thumb" accept="image/jpeg,image/jpg" required />
+                                </div>
+                                <div class="field-group">
+                                    <label>Parent's Signature <span class="required">*</span></label>
+                                    <input type="file" id="parentSign" name="parentSign" accept="image/jpeg,image/jpg"
+                                        required />
+                                </div>
+                                <div class="field-group">
+                                    <label>SSLC Marks Card <span class="required">*</span></label>
+                                    <input type="file" id="marksCard" name="marksCard" accept=".pdf,image/*" required />
+                                </div>
+                                <div class="field-group">
+                                    <label>Aadhaar Card <span class="required">*</span></label>
+                                    <input type="file" id="aadharFile" name="aadharFile" accept=".pdf,image/*"
+                                        required />
+                                </div>
+                                <div class="field-group">
+                                    <label>Caste Certificate (if SC/ST/OBC)</label>
+                                    <input type="file" id="casteCert" name="casteCert" accept=".pdf,image/*" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Income Certificate</label>
+                                    <input type="file" id="incomeCert" name="incomeCert" accept=".pdf,image/*" />
+                                </div>
+                            </div>
+
+                            <div class="step-actions">
+                                <button type="button" class="save-draft-btn" onclick="saveDraft(5)">
+                                    💾 Save Draft
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Declaration & Submit -->
+                        <div class="submit-section">
+                            <h3>📋 Declaration & Submit</h3>
+                            <div
+                                style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: left;">
+                                <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer;">
+                                    <input type="checkbox" id="declaration" name="declaration" required
+                                        style="width: 22px; height: 22px; margin-top: 0.2rem; accent-color: #059669;" />
+                                    <span style="font-size: 0.95rem; line-height: 1.6;">
+                                        I hereby declare that all the information provided is true to the best of my
+                                        knowledge.
+                                        I understand that any false information may result in cancellation of admission.
+                                        <span style="color: #fbbf24;">*</span>
+                                    </span>
+                                </label>
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                📤 Submit Application
+                            </button>
+                            <p style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.9;">
+                                Application Fee: ₹250 (General) | ₹100 (SC/ST) - Payable during verification
+                            </p>
+                        </div>
+                    </form>
+
+                    <div id="applicationResponse" style="margin-top: 2rem;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 Government Polytechnic College Hole Alur. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+    <script>
+        // Toggle Application Form
+        function toggleApplicationForm() {
+            const container = document.getElementById('applicationFormContainer');
+            const btn = document.getElementById('applyNowBtn');
+
+            if (container.classList.contains('show')) {
+                container.classList.remove('show');
+                btn.innerHTML = '🚀 Apply Now';
+                btn.classList.remove('active');
+            } else {
+                container.classList.add('show');
+                btn.innerHTML = '✕ Close Form';
+                btn.classList.add('active');
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                loadDraft(); // Load any saved draft
+            }
+        }
+
+        // Save Draft functionality
+        function saveDraft(stepNumber) {
+            const formData = new FormData(document.getElementById('diplomaApplicationForm'));
+            const data = {};
+            formData.forEach((value, key) => {
+                if (typeof value === 'string') {
+                    data[key] = value;
+                }
+            });
+
+            localStorage.setItem('diplomaApplicationDraft', JSON.stringify(data));
+
+            // Mark step as completed
+            const step = document.getElementById('step' + stepNumber);
+            step.classList.add('completed');
+
+            // Update button
+            const btn = step.querySelector('.save-draft-btn');
+            btn.innerHTML = '✓ Saved';
+            btn.classList.add('saved');
+
+            setTimeout(() => {
+                btn.innerHTML = '💾 Save Draft';
+                btn.classList.remove('saved');
+            }, 2000);
+
+            updateProgress();
+        }
+
+        // Load Draft
+        function loadDraft() {
+            const saved = localStorage.getItem('diplomaApplicationDraft');
+            if (saved) {
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    const field = document.querySelector(`[name="${key}"]`);
+                    if (field && field.type !== 'file') {
+                        field.value = data[key];
+                    }
+                });
+            }
+        }
+
+        // Update Progress
+        function updateProgress() {
+            const steps = document.querySelectorAll('.form-step.completed');
+            const total = 5;
+            const completed = steps.length;
+            const percent = Math.round((completed / total) * 100);
+
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressSteps').textContent = `Step ${completed} of ${total} completed`;
+            document.getElementById('progressPercent').textContent = percent + '%';
+        }
+
+        // Form submission
+        document.getElementById('diplomaApplicationForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const submitBtn = this.querySelector('.submit-btn');
+            const responseDiv = document.getElementById('applicationResponse');
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Submitting...';
+
+            try {
+                const formData = new FormData(this);
+
+                const response = await fetch('/api/submit_application', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) throw new Error(result.error || 'Submission failed');
+
+                responseDiv.innerHTML = `
+                    <div style="padding: 2rem; background: linear-gradient(135deg, #ecfdf5 0%, white 100%); border-radius: 16px; border: 2px solid #059669; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+                        <h3 style="color: #059669; font-size: 1.5rem; margin-bottom: 1rem;">Application Submitted Successfully!</h3>
+                        <p style="color: var(--gray-700); font-size: 1.1rem; margin-bottom: 1rem;">
+                            <strong>Your Application Number:</strong><br/>
+                            <span style="font-family: monospace; font-size: 1.5rem; color: #1e40af; background: #eff6ff; padding: 0.5rem 1rem; border-radius: 8px; display: inline-block; margin-top: 0.5rem;">${result.reference}</span>
+                        </p>
+                        <p style="color: var(--gray-600); font-size: 0.95rem; line-height: 1.8;">
+                            📧 Details have been sent to the administration team (bm4248757@gmail.com).<br/>
+                            📞 Our team will contact you within 3-5 working days for document verification.<br/>
+                            📋 Please keep your original documents ready for verification.
+                        </p>
+                        <button onclick="window.print()" style="margin-top: 1.5rem; padding: 0.75rem 2rem; background: #1e40af; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            🖨️ Print Application
+                        </button>
+                    </div>
+                `;
+
+                localStorage.removeItem('diplomaApplicationDraft');
+                this.reset();
+                document.querySelectorAll('.form-step').forEach(step => step.classList.remove('completed'));
+                updateProgress();
+
+                submitBtn.innerHTML = '✓ Submitted';
+                responseDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                responseDiv.innerHTML = `
+                    <div style="padding: 1.5rem; background: #fef2f2; border-radius: 12px; border: 1px solid #fecaca; text-align: center;">
+                        <p style="color: #dc2626;">❌ Error: ${error.message}</p>
+                        <p style="font-size: 0.85rem; color: #7f1d1d; margin-top: 0.5rem;">Please check server configuration or internet connection.</p>
+                    </div>
+                `;
+                submitBtn.innerHTML = originalText;
+            }
+
+            submitBtn.disabled = false;
+        });
+    </script>
+</body>
+
+</html>

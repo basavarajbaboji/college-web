@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Student enrollment statistics at Government Polytechnic College Hole Alur.">
+    <title>Student Details | Government Polytechnic College Hole Alur</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="margin: 0;">Government Polytechnic College Hole Alur</h1>
+                <nav style="position: relative;">
+                    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="branches.html">Branches</a></li>
+                        <li><a href="admissions.html">Admissions</a></li>
+                        <li><a href="faculty.html">Faculty</a></li>
+                        <li><a href="student_details.html" aria-current="page">Student Details</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="admin.html">Admin</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="student-details" class="section">
+            <div class="container">
+                <h2>📊 Student Details</h2>
+                <p style="text-align: center; color: var(--gray-600); max-width: 600px; margin: 0 auto 2rem;">
+                    Branch-wise and semester-wise enrollment statistics for the current academic year.
+                </p>
+
+                <div style="overflow-x: auto; border-radius: 12px; border: 1px solid var(--gray-200);">
+                    <table id="studentDetailsTable">
+                        <thead>
+                            <tr>
+                                <th>🎓 Branch</th>
+                                <th>📅 Semester</th>
+                                <th>👥 Student Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="3" style="text-align: center;">
+                                    <div class="loading" style="margin: 1rem auto;"></div>
+                                    <p>Loading student data...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Statistics Summary -->
+                <div id="statsSummary"
+                    style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 Government Polytechnic College Hole Alur. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.querySelector('#studentDetailsTable tbody');
+            const statsSummary = document.getElementById('statsSummary');
+
+            fetch('/api/student_details')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to fetch');
+                    return response.json();
+                })
+                .then(data => {
+                    const studentDetails = data.student_details || [];
+                    if (studentDetails.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No student details available.</td></tr>';
+                        return;
+                    }
+
+                    let totalStudents = 0;
+                    const branchTotals = {};
+
+                    studentDetails.forEach(detail => {
+                        totalStudents += detail.count;
+                        branchTotals[detail.branch] = (branchTotals[detail.branch] || 0) + detail.count;
+                    });
+
+                    tableBody.innerHTML = '';
+                    studentDetails.forEach((detail, index) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${detail.branch}</td>
+                            <td>Semester ${detail.semester}</td>
+                            <td><strong style="color: var(--primary-blue);">${detail.count}</strong></td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+
+                    const totalRow = document.createElement('tr');
+                    totalRow.innerHTML = `
+                        <td colspan="2" style="text-align: right; font-weight: bold; color: var(--gray-700);">Total Students</td>
+                        <td><strong style="color: var(--accent-green); font-size: 1.1rem;">${totalStudents}</strong></td>
+                    `;
+                    tableBody.appendChild(totalRow);
+
+                    statsSummary.innerHTML = `
+                        <div class="stats-card">
+                            <h3>${totalStudents}</h3>
+                            <p>Total Students</p>
+                        </div>
+                        <div class="stats-card">
+                            <h3>${Object.keys(branchTotals).length}</h3>
+                            <p>Active Branches</p>
+                        </div>
+                        <div class="stats-card">
+                            <h3>6</h3>
+                            <p>Semesters</p>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--accent-orange);">Failed to load student details.</td></tr>';
+                });
+        });
+    </script>
+</body>
+
+</html>

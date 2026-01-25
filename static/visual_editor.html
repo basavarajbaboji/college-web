@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Page Editor | Admin Console</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #1f2937;
+            --text-secondary: #6b7280;
+            --bg: #f3f4f6;
+            --toolbar-height: 60px;
+            --panel-width: 320px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #e5e5e5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            height: var(--toolbar-height);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text);
+        }
+
+        .brand span {
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .device-toggles {
+            display: flex;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .device-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            color: var(--text-secondary);
+        }
+
+        .device-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Workspace */
+        .workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #e5e5e5;
+            /* Canvas bg */
+            padding: 2rem;
+            position: relative;
+            overflow: auto;
+        }
+
+        iframe {
+            background: white;
+            border: none;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            transition: width 0.3s ease;
+        }
+
+        iframe.preview-desktop {
+            width: 100%;
+            height: 100%;
+            max-width: 1440px;
+        }
+
+        iframe.preview-mobile {
+            width: 375px;
+            height: 812px;
+            border-radius: 40px;
+            border: 8px solid #333;
+        }
+
+        /* Properties Panel */
+        .properties-panel {
+            width: var(--panel-width);
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        /* Left Library Panel */
+        .library-panel {
+            width: var(--panel-width);
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .component-item {
+            padding: 0.75rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .component-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .component-icon {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .component-info h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .component-info p {
+            margin: 0.2rem 0 0;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+
+        .panel-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .prop-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .prop-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .prop-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            background: #fafafa;
+        }
+
+        .prop-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .prop-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--border);
+            padding: 0.25rem;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        input[type="color"] {
+            border: none;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            background: none;
+        }
+
+        /* Loading */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 1rem; color: #6b7280; font-weight: 500;">Initializing Visual Editor...</p>
+    </div>
+
+    <!-- Top Toolbar -->
+    <header class="toolbar">
+        <div class="brand">
+            🔧 Visual Editor <span>BETA</span>
+        </div>
+
+        <div class="device-toggles">
+            <button class="device-btn active" onclick="setDevice('desktop')" title="Desktop View">🖥️</button>
+            <button class="device-btn" onclick="setDevice('mobile')" title="Mobile View">📱</button>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-outline" onclick="window.location.href='/admin/dashboard'">Close</button>
+            <button class="btn btn-primary" id="saveBtn" onclick="saveChanges()">
+                💾 Save Changes
+            </button>
+        </div>
+    </header>
+
+    <div class="workspace">
+
+        <!-- Left Library Panel -->
+        <aside class="library-panel">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('components')">Components</button>
+                <button class="tab-btn" onclick="switchTab('design')">Design</button>
+            </div>
+
+            <div class="panel-content" id="libraryContent">
+                <!-- Components injected here -->
+            </div>
+        </aside>
+
+        <!-- Main Canvas -->
+        <div class="canvas-container">
+            <iframe id="editorFrame" class="preview-desktop" src=""></iframe>
+        </div>
+
+        <!-- Right Properties Panel -->
+        <aside class="properties-panel">
+            <div class="panel-header">
+                Properties
+                <span id="selectedTag"
+                    style="font-size: 0.8rem; background: #e5e7eb; padding: 2px 6px; border-radius: 4px; color: #6b7280;">None</span>
+            </div>
+
+            <div class="panel-content" id="propertiesContent">
+                <div class="empty-state">
+                    <p>Select an element on the canvas to edit its properties.</p>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Templates for Property Controls -->
+    <template id="text-props-template">
+        <div class="prop-group">
+            <label class="prop-label">Content</label>
+            <textarea class="prop-input" rows="4" data-bind="textContent"></textarea>
+        </div>
+        <div class="prop-group">
+            <label class="prop-label">Text Color</label>
+            <div class="color-picker-wrapper">
+                <input type="color" data-bind="color" />
+                <input type="text" class="prop-input" style="border:none; padding: 0.2rem;" data-bind="colorText" />
+            </div>
+        </div>
+    </template>
+
+    <template id="image-props-template">
+        <div class="prop-group">
+            <label class="prop-label">Image Source</label>
+            <input type="text" class="prop-input" data-bind="src" readonly style="cursor: pointer;"
+                onclick="triggerImageUpload()" />
+            <button class="btn btn-outline" style="width: 100%; margin-top: 0.5rem;"
+                onclick="triggerImageUpload()">Upload New Image</button>
+        </div>
+        <div class="prop-group">
+            <label class="prop-label">Alt Text</label>
+            <input type="text" class="prop-input" data-bind="alt" />
+        </div>
+    </template>
+
+    <template id="bg-props-template">
+        <div class="prop-group">
+            <label class="prop-label">Background Color</label>
+            <div class="color-picker-wrapper">
+                <input type="color" data-bind="backgroundColor" />
+                <input type="text" class="prop-input" style="border:none; padding: 0.2rem;" data-bind="bgColorText" />
+            </div>
+        </div>
+    </template>
+
+    <input type="file" id="globalImageUpload" accept="image/*" style="display: none;" />
+
+    <script src="/admin/visual_editor.js"></script>
+</body>
+
+</html>

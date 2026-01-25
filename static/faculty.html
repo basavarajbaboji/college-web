@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Meet our expert faculty members at Government Polytechnic College Hole Alur.">
+    <title>Faculty | Government Polytechnic College Hole Alur</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="margin: 0;">Government Polytechnic College Hole Alur</h1>
+                <nav style="position: relative;">
+                    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="branches.html">Branches</a></li>
+                        <li><a href="admissions.html">Admissions</a></li>
+                        <li><a href="faculty.html" aria-current="page">Faculty</a></li>
+                        <li><a href="student_details.html">Student Details</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="admin.html">Admin</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="faculty" class="section">
+            <div class="container">
+                <h2>👨‍🏫 Our Faculty</h2>
+                <p style="text-align: center; color: var(--gray-600); max-width: 800px; margin: 0 auto 2rem;">
+                    Our faculty comprises experienced educators and industry professionals dedicated to providing
+                    quality education and mentorship to our students.
+                </p>
+
+                <ul class="faculty-list" id="facultyList">
+                    <li>
+                        <h3>Loading faculty data...</h3>
+                        <p>Please wait while we fetch the latest information.</p>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 Government Polytechnic College Hole Alur. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const facultyList = document.getElementById('facultyList');
+
+            fetch('/api/faculty_details')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to fetch');
+                    return response.json();
+                })
+                .then(data => {
+                    const facultyMembers = data.faculty || [];
+
+                    if (facultyMembers.length === 0) {
+                        facultyList.innerHTML = '<li><h3>No faculty data available.</h3></li>';
+                        return;
+                    }
+
+                    facultyList.innerHTML = '';
+                    facultyMembers.forEach((member, index) => {
+                        const li = document.createElement('li');
+                        li.style.animationDelay = `${index * 0.1}s`;
+                        li.innerHTML = `
+                            <div class="faculty-card" style="background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); transition: transform 0.3s, box-shadow 0.3s;">
+                                <h3 style="margin-top: 0; color: var(--primary-blue); display: flex; align-items: center; gap: 0.5rem;" data-db-field="name" data-db-index="${index}">👤 ${member.name}</h3>
+                                <p style="margin-bottom: 0.5rem;"><strong>🎯 Role:</strong> <span style="color: var(--accent-purple); font-weight: 600;" data-db-field="role" data-db-index="${index}">${member.role || 'N/A'}</span></p>
+                                <p style="margin-bottom: 0.5rem;"><strong>🎓 Qualification:</strong> <span data-db-field="qualification" data-db-index="${index}">${member.qualification || 'N/A'}</span></p>
+                                <p style="margin-bottom: 0.5rem;"><strong>⏳ Experience:</strong> <span data-db-field="experience" data-db-index="${index}">${member.experience || 'N/A'}</span></p>
+                                <p style="margin-bottom: 0.5rem;"><strong>🔬 Specialization:</strong> <span style="color: var(--primary-blue);" data-db-field="specialization" data-db-index="${index}">${member.specialization || 'General Engineering'}</span></p>
+                                <p style="margin-bottom: 0.5rem;"><strong>📚 Subjects Handled:</strong> <span style="color: var(--accent-orange); font-style: italic;" data-db-field="subjects" data-db-index="${index}">${member.subjects || 'Core Engineering Subjects'}</span></p>
+                                <p style="margin-bottom: 0.5rem;"><strong>🏆 Achievements:</strong> <span data-db-field="achievements" data-db-index="${index}">${member.achievements || 'Distinguished Academician'}</span></p>
+                                <p style="margin-bottom: 0.5rem;"><strong>📝 About:</strong> <span data-db-field="description" data-db-index="${index}">${member.description || 'N/A'}</span></p>
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-100); display: flex; flex-wrap: wrap; gap: 1rem;">
+                                    <span><strong>📞 Phone:</strong> <span data-db-field="phone" data-db-index="${index}">${member.phone || 'N/A'}</span></span>
+                                    <span><strong>📧 Email:</strong> <a href="mailto:${member.email}" style="color: var(--primary-blue); text-decoration: none;" data-db-field="email" data-db-index="${index}">${member.email || 'N/A'}</a></span>
+                                </div>
+                            </div>
+                        `;
+                        facultyList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                    facultyList.innerHTML = '<li><h3 style="color: var(--accent-orange);">Failed to load faculty data.</h3></li>';
+                });
+        });
+    </script>
+</body>
+
+</html>
