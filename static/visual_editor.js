@@ -105,12 +105,114 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- Sidebar Logic ---
+let activePropTab = 'style'; // 'style' or 'code'
+
 window.switchTab = (tab) => {
     activeTab = tab;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.library-panel .tab-btn').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active'); // Assume click event context
     renderLibrary();
 };
+
+window.switchPropTab = (tab) => {
+    activePropTab = tab;
+    document.querySelectorAll('.properties-panel .tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active'); // Assume click event context
+
+    // Handle Panel Resizing
+    const panel = document.querySelector('.properties-panel');
+    if (tab === 'code') {
+        panel.classList.add('wide');
+    } else {
+        panel.classList.remove('wide');
+    }
+
+    if (selectedElement) {
+        updatePropertiesPanel(selectedElement);
+    } else {
+        // If no element selected, render appropriate view
+        if (tab === 'code') {
+            renderGlobalCodeEditor();
+        } else {
+            document.getElementById('propertiesContent').innerHTML = `
+                <div class="empty-state">
+                    <p>Select an element on the canvas to edit its properties.</p>
+                </div>`;
+        }
+    }
+};;
+
+function renderGlobalCodeEditor() {
+    const panel = document.getElementById('propertiesContent');
+    const iframe = document.getElementById('editorFrame');
+
+    if (!iframe.contentDocument) return;
+
+    panel.innerHTML = '';
+
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    wrapper.style.height = '100%';
+
+    const label = document.createElement('div');
+    label.innerHTML = '<strong>📝 Full Page Source (Body)</strong>';
+    label.style.marginBottom = '0.5rem';
+    label.style.fontSize = '0.9rem';
+    label.style.color = '#374151';
+
+    const textarea = document.createElement('textarea');
+    textarea.style.width = '100%';
+    textarea.style.flex = '1';
+    textarea.style.fontFamily = 'monospace';
+    textarea.style.fontSize = '0.85rem';
+    textarea.style.padding = '0.5rem';
+    textarea.style.border = '1px solid #e5e7eb';
+    textarea.style.borderRadius = '6px';
+    textarea.style.marginBottom = '1rem';
+    textarea.style.resize = 'none';
+
+    // Get clean HTML (remove editor artifacts)
+    const clone = iframe.contentDocument.body.cloneNode(true);
+    clone.querySelectorAll('.ve-hover-outline, .ve-selected-outline, .ve-drop-zone').forEach(el => {
+        el.classList.remove('ve-hover-outline', 've-selected-outline', 've-drop-zone');
+        if (el.getAttribute('class') === '') el.removeAttribute('class');
+        if (el.contentEditable === 'true') el.removeAttribute('contentEditable');
+    });
+    // Remove scripts/styles we injected
+    Array.from(clone.children).forEach(child => {
+        if (child.tagName === 'SCRIPT' && child.src.includes('visual_editor')) child.remove();
+        if (child.tagName === 'STYLE' && child.innerHTML.includes('ve-hover-outline')) child.remove();
+    });
+
+    textarea.value = clone.innerHTML.trim();
+
+    const applyBtn = document.createElement('button');
+    applyBtn.textContent = '⚡ Apply Full Page Changes';
+    applyBtn.className = 'btn btn-primary';
+    applyBtn.style.width = '100%';
+    applyBtn.onclick = () => {
+        try {
+            // We need to preserve our editor scripts/styles while replacing content
+            // Simplest way: Body replacement but re-inject scripts
+            const newContent = textarea.value;
+            iframe.contentDocument.body.innerHTML = newContent;
+
+            // Re-inject editor necessities
+            injectEditorScripts(iframe);
+
+            markChanged();
+            alert('Full page updated!');
+        } catch (e) {
+            alert('Error applying HTML: ' + e.message);
+        }
+    };
+
+    wrapper.appendChild(label);
+    wrapper.appendChild(textarea);
+    wrapper.appendChild(applyBtn);
+    panel.appendChild(wrapper);
+}
 
 function renderLibrary() {
     const container = document.getElementById('libraryContent');
@@ -170,6 +272,8 @@ function renderLibrary() {
             grid.appendChild(btn);
         });
         container.appendChild(grid);
+    } else if (activeTab === 'layers') {
+        renderLayerTree(container);
     }
 }
 
@@ -274,21 +378,108 @@ function updatePropertiesPanel(el) {
     tagNameDisplay.textContent = el.tagName.toLowerCase() + (el.id ? '#' + el.id : '');
     panel.innerHTML = '';
 
+    // --- Code Editor Mode ---
+        if (activePropTab === 'code') {
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.height = '100%';
+
+        // Navigation to Full Source
+        const nav = document.createElement('div');
+        nav.style.marginBottom = '1rem';
+        nav.style.borderBottom = '1px solid #e5e7eb';
+        nav.style.paddingBottom = '0.5rem';
+        nav.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="font-size: 0.8rem; color: #4b5563;">Selected: &lt;${el.tagName.toLowerCase()}&gt;</strong>
+                <button id="viewFullSourceBtn" style="font-size: 0.8rem; color: #2563eb; background: none; border: none; cursor: pointer; text-decoration: underline;">View Full Source</button>
+            </div>
+        `;
+
+        const textarea = document.createElement('textarea');
+        textarea.style.width = '100%';
+        textarea.style.flex = '1';
+        textarea.style.fontFamily = 'monospace';
+        textarea.style.fontSize = '0.85rem';
+        textarea.style.padding = '0.5rem';
+        textarea.style.border = '1px solid #e5e7eb';
+        textarea.style.borderRadius = '6px';
+        textarea.style.marginBottom = '1rem';
+        textarea.style.resize = 'none';
+        textarea.value = el.outerHTML;
+
+        const applyBtn = document.createElement('button');
+        applyBtn.textContent = '⚡ Apply Changes';
+        applyBtn.className = 'btn btn-primary';
+        applyBtn.style.width = '100%';
+        applyBtn.onclick = () => {
+            try {
+                const newHTML = textarea.value;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = newHTML.trim();
+                
+                if (tempDiv.childElementCount !== 1) {
+                    alert('Error: Code must result in exactly one root element to ensure stability.');
+                    return;
+                }
+                
+                const newEl = tempDiv.firstElementChild;
+                el.replaceWith(newEl);
+                selectElement(newEl); // Re-select the new element
+                markChanged();
+                alert('Code applied successfully!');
+            } catch (e) {
+                alert('Invalid HTML: ' + e.message);
+            }
+        };
+
+        wrapper.appendChild(nav);
+        wrapper.appendChild(textarea);
+        wrapper.appendChild(applyBtn);
+        panel.appendChild(wrapper);
+
+        // Bind Back Button
+        setTimeout(() => {
+            const backBtn = document.getElementById('viewFullSourceBtn');
+            if(backBtn) {
+                backBtn.onclick = () => {
+                    selectElement(null); 
+                    renderGlobalCodeEditor();
+                };
+            }
+        }, 50);
+
+        return; // Stop rendering visual props
+    }
+
     // 1. Text Properties
     if (['H1', 'H2', 'H3', 'P', 'SPAN', 'DIV', 'A', 'LI', 'BUTTON', 'TH', 'TD'].includes(el.tagName)) {
-        const tmpl = document.getElementById('text-props-template').content.cloneNode(true);
-        const txtArea = tmpl.querySelector('[data-bind="textContent"]');
-        txtArea.value = el.innerText;
-        txtArea.addEventListener('input', (e) => {
-            el.innerText = e.target.value;
-            markChanged();
-        });
-        setupColorBinding(tmpl, el, 'color', 'colorText');
-        panel.appendChild(tmpl);
+        // ... (Basic text content binding - keeping existing functionality) ...
+        const contentTmpl = document.getElementById('text-props-template').content.cloneNode(true);
+        const txtArea = contentTmpl.querySelector('[data-bind="textContent"]');
+        if (txtArea) { // Check if template exists (it might have been replaced)
+            txtArea.value = el.innerText;
+            txtArea.addEventListener('input', (e) => {
+                el.innerText = e.target.value;
+                markChanged();
+            });
+            contentTmpl.querySelector('.color-picker-wrapper')?.remove(); // Remove old color picker from basictmpl if present, as it's in typography now
+            panel.appendChild(contentTmpl);
+        }
+
+        // --- NEW: Typography Binding ---
+        const typeTmpl = document.getElementById('typography-props-template').content.cloneNode(true);
+        setupStyleBinding(typeTmpl, el, 'fontFamily');
+        setupStyleBinding(typeTmpl, el, 'fontSize', 'px'); // Auto-append px if number
+        setupStyleBinding(typeTmpl, el, 'fontWeight');
+        setupStyleBinding(typeTmpl, el, 'textAlign');
+        setupColorBinding(typeTmpl, el, 'color', 'color'); // Reuse existing color logic but map to correct input
+        panel.appendChild(typeTmpl);
 
         el.contentEditable = "true";
         el.addEventListener('input', () => {
-            txtArea.value = el.innerText;
+            if (txtArea) txtArea.value = el.innerText;
             markChanged();
         });
     }
@@ -307,7 +498,32 @@ function updatePropertiesPanel(el) {
         panel.appendChild(tmpl);
     }
 
-    // 3. Background Properties
+    // 3. Spacing & Effects (Available for almost all block elements)
+    if (['SECTION', 'DIV', 'HEADER', 'FOOTER', 'BODY', 'MAIN', 'BUTTON', 'IMG'].includes(el.tagName)) {
+        // Spacing
+        const spacingTmpl = document.getElementById('spacing-props-template').content.cloneNode(true);
+        setupRangeBinding(spacingTmpl, el, 'padding', 'paddingVal');
+        setupRangeBinding(spacingTmpl, el, 'margin', 'marginVal');
+        panel.appendChild(spacingTmpl);
+
+        // Effects
+        const effectsTmpl = document.getElementById('effects-props-template').content.cloneNode(true);
+        setupStyleBinding(effectsTmpl, el, 'borderRadius', 'px');
+
+        // Box Shadow Toggle Logic
+        const shadowCheck = effectsTmpl.querySelector('[data-bind="boxShadow"]');
+        const currentShadow = window.getComputedStyle(el).boxShadow;
+        shadowCheck.checked = currentShadow !== 'none';
+        shadowCheck.addEventListener('change', (e) => {
+            const val = e.target.checked ? '0 4px 6px rgba(0,0,0,0.1)' : 'none';
+            el.style.boxShadow = val;
+            trackStyleChange(el, 'boxShadow', val);
+            markChanged();
+        });
+        panel.appendChild(effectsTmpl);
+    }
+
+    // 4. Background Properties
     if (['SECTION', 'DIV', 'HEADER', 'FOOTER', 'BODY', 'MAIN'].includes(el.tagName)) {
         const tmpl = document.getElementById('bg-props-template').content.cloneNode(true);
         setupColorBinding(tmpl, el, 'backgroundColor', 'bgColorText');
@@ -315,11 +531,58 @@ function updatePropertiesPanel(el) {
     }
 }
 
-// ... (Existing Helpers: setupColorBinding, trackStyleChange, markChanged, imageUpload, saveChanges, setDevice) ...
+// --- Binding Helpers ---
+
+function setupStyleBinding(tmpl, el, styleProp, suffix = '') {
+    const input = tmpl.querySelector(`[data-bind="${styleProp}"]`);
+    if (!input) return;
+
+    let currentVal = window.getComputedStyle(el)[styleProp];
+    // Clean up value (e.g. remove 'px' for number inputs)
+    if (suffix && currentVal.endsWith(suffix)) {
+        currentVal = currentVal.replace(suffix, '');
+    }
+    // Handle font family quotes cleanup
+    if (styleProp === 'fontFamily') {
+        currentVal = currentVal.replace(/"/g, '');
+    }
+
+    input.value = currentVal;
+
+    input.addEventListener('input', (e) => {
+        let val = e.target.value;
+        if (suffix && val !== '') val += suffix;
+        el.style[styleProp] = val;
+        trackStyleChange(el, styleProp, val);
+        markChanged();
+    });
+}
+
+function setupRangeBinding(tmpl, el, styleProp, displayRel) {
+    const input = tmpl.querySelector(`[data-bind="${styleProp}"]`);
+    const display = tmpl.querySelector(`[data-bind="${displayRel}"]`);
+
+    // Parse current value (handle "10px" -> 10)
+    let currentVal = parseInt(window.getComputedStyle(el)[styleProp]) || 0;
+    input.value = currentVal;
+    display.textContent = currentVal + 'px';
+
+    input.addEventListener('input', (e) => {
+        const val = e.target.value + 'px';
+        el.style[styleProp] = val;
+        display.textContent = val;
+        trackStyleChange(el, styleProp, val);
+        markChanged();
+    });
+}
 
 function setupColorBinding(tmpl, el, styleProp, textInputRel) {
+    // Handling case where textInputRel might be same as styleProp input or separate
     const colorInput = tmpl.querySelector(`[data-bind="${styleProp}"]`);
-    const textInput = tmpl.querySelector(`[data-bind="${textInputRel}"]`);
+    // If textInputRel is provided, try to find it, otherwise ignore
+    const textInput = textInputRel ? tmpl.querySelector(`[data-bind="${textInputRel}"]`) : null;
+
+    if (!colorInput) return; // Guard clause
 
     const rgb2hex = (rgb) => {
         if (!rgb || rgb === 'rgba(0, 0, 0, 0)') return '#ffffff';
@@ -396,23 +659,66 @@ function saveChanges() {
     btn.textContent = '⏳ Saving...';
     btn.disabled = true;
 
-    fetch('/api/save_styles', {
+    // 1. Save Styles (CSS)
+    const saveStyles = fetch('/api/save_styles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ styles: currentStyles })
-    })
-        .then(res => {
-            if (res.ok) {
+    });
+
+    // 2. Save HTML Content
+    const iframe = document.getElementById('editorFrame');
+    let saveHtml = Promise.resolve(); // Default if not applicable
+
+    if (iframe.contentDocument) {
+        // Clone doc to clean up editor artifacts
+        const clone = iframe.contentDocument.documentElement.cloneNode(true);
+
+        // Remove editor-specific adjustments
+        clone.querySelectorAll('.ve-hover-outline, .ve-selected-outline, .ve-drop-zone').forEach(el => {
+            el.classList.remove('ve-hover-outline', 've-selected-outline', 've-drop-zone');
+            if (el.getAttribute('class') === '') el.removeAttribute('class');
+            if (el.contentEditable === 'true') el.removeAttribute('contentEditable');
+        });
+
+        // Remove injected editor styles
+        const styles = clone.querySelectorAll('style');
+        styles.forEach(s => {
+            if (s.innerHTML.includes('ve-hover-outline')) s.remove();
+        });
+
+        const pageName = new URLSearchParams(window.location.search).get('page') || 'homepage';
+        const pageMap = {
+            'homepage': 'index.html', // Fixed mapping for filename
+            'branches': 'branches.html',
+            'faculty': 'faculty.html',
+            'admissions': 'admissions.html',
+            'contact': 'contact.html'
+        };
+        const targetFile = pageMap[pageName] || 'index.html';
+        const finalHtml = "<!DOCTYPE html>\n" + clone.outerHTML;
+
+        saveHtml = fetch('/api/save_html', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ page: targetFile, content: finalHtml })
+        });
+    }
+
+    Promise.all([saveStyles, saveHtml])
+        .then(([res1, res2]) => {
+            if (res1.ok && (res2 ? res2.ok : true)) {
                 hasUnsavedChanges = false;
                 btn.innerHTML = '💾 Save Changes';
                 btn.disabled = false;
-                alert('Visual changes saved successfully!');
+                alert('All changes (Visual & Code) saved successfully!');
             } else {
-                throw new Error('Save failed');
+                throw new Error('Partial save failure. Check console.');
             }
         })
         .catch(err => {
             alert('Error saving changes: ' + err.message);
+            console.error(err);
             btn.innerHTML = originalText;
             btn.disabled = false;
         });
@@ -429,5 +735,103 @@ function setDevice(mode) {
     } else {
         f.className = 'preview-desktop';
         btns[0].classList.add('active');
+    }
+}
+
+// --- Stock Photos ---
+const StockImages = [
+    { name: 'Campus', url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Library', url: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Student', url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Graduation', url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Classroom', url: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Study', url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Laboratory', url: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Books', url: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80' },
+    { name: 'University', url: 'https://images.unsplash.com/photo-1560179707-f14e90ef3dab?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Seminar', url: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Technology', url: 'https://images.unsplash.com/photo-1531297461136-82lwDe8y91-645?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Group', url: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=600&q=80' }
+];
+
+window.openStockModal = () => {
+    document.getElementById('stockModal').style.display = 'flex';
+    filterStockPhotos('');
+};
+
+window.closeStockModal = () => {
+    document.getElementById('stockModal').style.display = 'none';
+};
+
+window.filterStockPhotos = (query) => {
+    const grid = document.getElementById('stockGrid');
+    grid.innerHTML = '';
+
+    const filtered = StockImages.filter(img => img.name.toLowerCase().includes(query.toLowerCase()));
+
+    filtered.forEach(img => {
+        const div = document.createElement('div');
+        div.style = "cursor: pointer; border-radius: 8px; overflow: hidden; height: 120px; position: relative;";
+        div.innerHTML = `
+            <img src="${img.url}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; padding: 4px 8px; font-size: 0.75rem;">${img.name}</div>
+        `;
+        div.onclick = () => {
+            selectStockPhoto(img.url);
+        };
+        grid.appendChild(div);
+    });
+};
+
+function selectStockPhoto(url) {
+    if (selectedElement && selectedElement.tagName === 'IMG') {
+        selectedElement.src = url;
+        updatePropertiesPanel(selectedElement);
+        markChanged();
+        closeStockModal();
+    }
+}
+
+function renderLayerTree(container) {
+    const iframe = document.getElementById('editorFrame');
+    if (!iframe.contentDocument) return;
+    const root = iframe.contentDocument.body;
+
+    function buildTree(node, parentEl) {
+        // Skip script/style/hidden
+        if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'svg', 'path'].includes(node.tagName) || node.nodeType !== 1) return;
+
+        const item = document.createElement('div');
+        item.className = 'layer-item';
+        if (selectedElement === node) item.classList.add('active');
+
+        // Label
+        let label = node.tagName.toLowerCase();
+        if (node.id) label += `<span style="color:#6b7280">#${node.id}</span>`;
+        else if (node.className && typeof node.className === 'string' && node.className.trim()) {
+            // Filter out our internal classes
+            const cls = node.className.replace('ve-hover-outline', '').replace('ve-selected-outline', '').replace('ve-drop-zone', '').trim();
+            if (cls) label += `<span style="color:#6b7280; font-size:0.75rem">.${cls.split(' ')[0]}</span>`;
+        }
+
+        item.innerHTML = `<span>${label}</span>`;
+        item.onclick = (e) => {
+            e.stopPropagation();
+            selectElement(node);
+            renderLibrary(); // Re-render to update active state
+        };
+
+        parentEl.appendChild(item);
+
+        if (node.children.length > 0) {
+            const childrenContainer = document.createElement('div');
+            childrenContainer.className = 'layer-children';
+            Array.from(node.children).forEach(child => buildTree(child, childrenContainer));
+            parentEl.appendChild(childrenContainer);
+        }
+    }
+
+    if (root) {
+        buildTree(root, container);
     }
 }

@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('edit-section-container');
     const landing = document.getElementById('dashboard-landing');
 
+
     // Unified click handler for navigation and dashboard cards
     document.addEventListener('click', (e) => {
         // Handle data-section button clicks (Nav links & Dashboard cards)
@@ -30,15 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Handle mobile menu toggle specifically
-        const toggleBtn = e.target.closest('.menu-toggle');
-        if (toggleBtn) {
-            const nav = document.getElementById('adminNavLinks') || document.querySelector('.nav-links');
-            if (nav) {
-                nav.classList.toggle('show');
-                toggleBtn.innerHTML = nav.classList.contains('show') ? '✕' : '☰';
-            }
-        }
     });
 
     function showDashboard() {
@@ -57,9 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         switch (section) {
-            case 'homepage': loadLiveEditor('/index.html', 'homepage'); break;
+            case 'homepage': loadHomepageManager(); break;
             case 'branches': loadLiveEditor('/branches.html', 'branches'); break;
-            case 'faculty': loadLiveEditor('/faculty.html', 'faculty'); break;
+            case 'faculty': loadFacultyEditor(); break;
             case 'admissions': loadLiveEditor('/admissions.html', 'admissions'); break;
             case 'contact': loadLiveEditor('/contact.html', 'contact'); break;
             case 'manage_applications': loadApplicationsManager(); break;
@@ -88,16 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(data => {
                 container.innerHTML = injectBackButton(`
-            < div class="editor-header" style = "margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem;" >
-                <h2>🎓 Edit Branch Details</h2>
-                    </div >
-            <form id="branchesForm">
-                <div id="branchesList"></div>
-                <button type="button" id="addBranchBtn" style="background: #059669; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; margin-top: 1rem;">+ Add New Branch</button>
-                <hr style="margin: 2rem 0; border: none; border-top: 2px solid #e2e8f0;">
-                    <button type="submit" style="background: #1e40af; color: white; padding: 0.75rem 2.5rem; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Save All Branches</button>
-            </form>
-        `);
+                    <div class="editor-header" style="margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem;">
+                        <h2>🎓 Edit Branch Details</h2>
+                    </div>
+                    <form id="branchesForm">
+                        <div id="branchesList"></div>
+                        <button type="button" id="addBranchBtn" class="admin-add-btn">+ Add New Branch</button>
+                        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #e2e8f0;">
+                        <button type="submit" class="admin-save-btn">Save All Branches</button>
+                    </form>
+                `);
                 const branchesList = document.getElementById('branchesList');
                 data.forEach(branch => { addBranchInput(branch.name, branch.description, branch.future_tech, branch.current_usage, branch.career_roles, branch.core_subjects, branch.key_skills, branch.eligibility, branch.duration, branch.intake, branch.labs); });
                 document.getElementById('addBranchBtn').addEventListener('click', () => { addBranchInput('', '', '', '', '', '', '', '', '', '', ''); });
@@ -124,28 +116,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 function addBranchInput(name, description, future_tech, current_usage, career_roles, core_subjects, key_skills, eligibility, duration, intake, labs) {
                     const div = document.createElement('div');
-                    div.style = "background: #f8fafc; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border: 1px solid #e2e8f0; position: relative;";
-                    div.classList.add('branch-entry');
+                    div.classList.add('admin-form-card', 'branch-entry');
+
                     div.innerHTML = `
-            < input type = "text" name = "branchName" placeholder = "Branch Name" value = "${name}" required style = "width: 100%; padding: 0.6rem; margin-bottom: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700;" />
-                        <textarea name="branchDescription" placeholder="Branch Description" required style="width: 100%; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; min-height: 80px; margin-bottom: 1rem;">${description}</textarea>
+                        <button type="button" class="removeBtn admin-delete-btn">🗑️ Delete Entry</button>
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="text" name="duration" placeholder="Duration" value="${duration || ''}" style="padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px;" />
-                            <input type="text" name="eligibility" placeholder="Eligibility" value="${eligibility || ''}" style="padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px;" />
-                            <input type="number" name="intake" placeholder="Intake Capacity" value="${intake || ''}" style="padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px;" />
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display:block; margin-bottom:0.5rem; font-weight:600; color:var(--gray-700);">Branch Name</label>
+                            <input type="text" class="admin-input" name="branchName" placeholder="e.g. Computer Science Engineering" value="${name}" required style="font-weight: 700; font-size: 1.1rem;" />
                         </div>
 
-                        <textarea name="labs" placeholder="Laboratories (comma separated)" style="width: 100%; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; min-height: 50px; margin-bottom: 0.5rem;">${labs || ''}</textarea>
-                        <textarea name="coreSubjects" placeholder="Core Subjects" style="width: 100%; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; min-height: 50px; margin-bottom: 0.5rem;">${core_subjects || ''}</textarea>
-                        <textarea name="key_skills" placeholder="Key Skills" style="width: 100%; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; min-height: 50px; margin-bottom: 0.5rem;">${key_skills || ''}</textarea>
-                        <textarea name="futureTech" placeholder="Future Technology Details" style="width: 100%; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; min-height: 60px; margin-bottom: 0.5rem;">${future_tech || ''}</textarea>
-                        <textarea name="currentUsage" placeholder="Current Industry Use" style="width: 100%; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; min-height: 60px; margin-bottom: 0.5rem;">${current_usage || ''}</textarea>
-                        <input type="text" name="careerRoles" placeholder="Career Roles" value="${career_roles || ''}" style="width: 100%; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px;" />
-                        <button type="button" class="removeBtn" style="position: absolute; top: 1rem; right: 1rem; background: #ef4444; color: white; border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer;">×</button>
-        `;
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display:block; margin-bottom:0.5rem; font-weight:600; color:var(--gray-700);">Description</label>
+                            <textarea class="admin-textarea" name="branchDescription" placeholder="Brief description of the branch...">${description}</textarea>
+                        </div>
+                        
+                        <div class="admin-form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <input type="text" class="admin-input" name="duration" placeholder="Duration (e.g. 3 Years)" value="${duration || ''}" />
+                            <input type="text" class="admin-input" name="eligibility" placeholder="Eligibility (e.g. SSLC)" value="${eligibility || ''}" />
+                            <input type="number" class="admin-input" name="intake" placeholder="Intake Capacity" value="${intake || ''}" />
+                        </div>
+
+                        <div class="admin-form-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div>
+                                <label style="display:block; margin-bottom:0.5rem; font-weight:600; color:var(--gray-700);">Future Tech</label>
+                                <textarea class="admin-textarea" name="futureTech" placeholder="Future scope...">${future_tech || ''}</textarea>
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:0.5rem; font-weight:600; color:var(--gray-700);">Current Usage</label>
+                                <textarea class="admin-textarea" name="currentUsage" placeholder="Industry usage...">${current_usage || ''}</textarea>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom:0.5rem; font-weight:600; color:var(--gray-700);">Labs</label>
+                            <textarea class="admin-textarea" name="labs" placeholder="Laboratories (comma separated)..." style="min-height: 60px;">${labs || ''}</textarea>
+                        </div>
+
+                        <div class="admin-form-grid" style="grid-template-columns: 1fr 1fr;">
+                            <textarea class="admin-textarea" name="coreSubjects" placeholder="Core Subjects..." style="min-height: 60px;">${core_subjects || ''}</textarea>
+                            <textarea class="admin-textarea" name="key_skills" placeholder="Key Skills..." style="min-height: 60px;">${key_skills || ''}</textarea>
+                        </div>
+                        
+                        <input type="text" class="admin-input" name="careerRoles" placeholder="Career Roles (comma separated)" value="${career_roles || ''}" />
+                    `;
                     branchesList.appendChild(div);
-                    div.querySelector('.removeBtn').addEventListener('click', () => { div.remove(); });
+                    div.querySelector('.removeBtn').addEventListener('click', () => {
+                        if (confirm('Delete this branch?')) div.remove();
+                    });
                 }
             });
     }
@@ -157,19 +175,19 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 const facultyList = data.faculty || [];
                 container.innerHTML = injectBackButton(`
-            < div class="editor-header" style = "margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem;" >
-                <h2>👨‍🏫 Edit Faculty Profiles</h2>
-                    </div >
-            <form id="facultyForm">
-                <div id="facultyList"></div>
-                <button type="button" id="addFacultyBtn" style="background: #059669; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; margin-top: 1rem;">+ Add New Faculty</button>
-                <hr style="margin: 2rem 0; border: none; border-top: 2px solid #e2e8f0;">
-                    <button type="submit" style="background: #1e40af; color: white; padding: 0.75rem 2.5rem; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Save All Faculty</button>
-            </form>
-        `);
+                    <div class="editor-header" style="margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem;">
+                        <h2>👨‍🏫 Edit Faculty Profiles</h2>
+                    </div>
+                    <form id="facultyForm">
+                        <div id="facultyList"></div>
+                        <button type="button" id="addFacultyBtn" class="admin-add-btn">+ Add New Faculty</button>
+                        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #e2e8f0;">
+                        <button type="submit" class="admin-save-btn">Save All Faculty</button>
+                    </form>
+                `);
                 const facultyListDiv = document.getElementById('facultyList');
-                facultyList.forEach(f => { addFacultyInput(f.name, f.phone, f.email, f.role, f.description, f.qualification, f.experience, f.specialization, f.achievements, f.subjects); });
-                document.getElementById('addFacultyBtn').addEventListener('click', () => { addFacultyInput('', '', '', '', '', '', '', '', '', ''); });
+                facultyList.forEach(f => { addFacultyInput(f.name, f.phone, f.email, f.role, f.description, f.qualification, f.experience, f.specialization, f.achievements, f.subjects, f.branch, f.image_url); });
+                document.getElementById('addFacultyBtn').addEventListener('click', () => { addFacultyInput('', '', '', '', '', '', '', '', '', '', '', ''); });
                 document.getElementById('facultyForm').addEventListener('submit', (e) => {
                     e.preventDefault();
                     const facultyData = [];
@@ -177,6 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         facultyData.push({
                             name: entry.querySelector('input[name="name"]').value.trim(),
                             role: entry.querySelector('input[name="role"]').value.trim(),
+                            branch: entry.querySelector('select[name="branch"]').value,
+                            image_url: entry.querySelector('input[name="image_url"]').value.trim(),
                             qualification: entry.querySelector('input[name="qualification"]').value.trim(),
                             specialization: entry.querySelector('input[name="specialization"]').value.trim(),
                             achievements: entry.querySelector('input[name="achievements"]').value.trim(),
@@ -191,27 +211,89 @@ document.addEventListener('DOMContentLoaded', () => {
                         .then(res => { if (res.ok) alert('Faculty updated successfully.'); });
                 });
 
-                function addFacultyInput(name, phone, email, role, description, qualification, experience, specialization, achievements, subjects) {
+                function addFacultyInput(name, phone, email, role, description, qualification, experience, specialization, achievements, subjects, branch, image_url) {
                     const div = document.createElement('div');
-                    div.style = "background: #f8fafc; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border: 1px solid #e2e8f0; position: relative;";
-                    div.classList.add('faculty-entry');
+                    div.classList.add('admin-form-card', 'faculty-entry');
+
+                    const branches = ['Non-Teaching', 'Computer Science Engineering', 'Electrical and Electronics Engineering', 'Electronics and Communication Engineering', 'Mechanical Engineering'];
+                    const branchOptions = branches.map(b => `<option value="${b}" ${branch === b ? 'selected' : ''}>${b}</option>`).join('');
+
                     div.innerHTML = `
-            < div style = "display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;" >
-                            <input type="text" name="name" placeholder="Name" value="${name}" required style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1;" />
-                            <input type="text" name="role" placeholder="Role/Designation" value="${role}" style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1;" />
-                            <input type="text" name="qualification" placeholder="Qualification" value="${qualification || ''}" style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1;" />
-                            <input type="text" name="experience" placeholder="Years of Experience" value="${experience || ''}" style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1;" />
-                            <input type="text" name="specialization" placeholder="Specialization" value="${specialization || ''}" style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1;" />
-                            <input type="text" name="subjects" placeholder="Subjects Handled" value="${subjects || ''}" style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1;" />
-                            <input type="text" name="achievements" placeholder="Achievements" value="${achievements || ''}" style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1;" />
-                            <input type="text" name="phone" placeholder="Phone" value="${phone || ''}" style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1;" />
-                            <input type="email" name="email" placeholder="Email" value="${email || ''}" style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1;" />
-                        </div >
-                        <textarea name="description" placeholder="Bio" style="width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; min-height: 80px;">${description || ''}</textarea>
-                        <button type="button" class="removeBtn" style="position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">×</button>
-        `;
+                        <button type="button" class="removeBtn admin-delete-btn">🗑️ Delete Entry</button>
+                        
+                        <div class="admin-form-header">
+                            <div class="admin-photo-upload">
+                                <div class="admin-photo-preview">
+                                    <img src="${image_url || '/placeholder-avatar.png'}" style="width: 100%; height: 100%; object-fit: cover;" class="faculty-img-preview" onerror="this.src='https://via.placeholder.com/100'" />
+                                </div>
+                                <input type="file" class="faculty-upload" style="display: none;" accept="image/*" />
+                                <button type="button" class="upload-btn admin-upload-btn">Change Photo</button>
+                                <input type="hidden" name="image_url" value="${image_url || ''}" />
+                            </div>
+                            
+                            <div class="admin-main-details">
+                                <input type="text" class="admin-input" name="name" placeholder="Full Name" value="${name}" required />
+                                <input type="text" class="admin-input" name="role" placeholder="Role (e.g. Principal, HOD)" value="${role}" required />
+                                <select class="admin-input" name="branch">
+                                    <option value="" disabled ${!branch ? 'selected' : ''}>Select Branch</option>
+                                    ${branchOptions}
+                                </select>
+                                <input type="text" class="admin-input" name="qualification" placeholder="Qualification" value="${qualification || ''}" />
+                            </div>
+                        </div>
+
+                        <div class="admin-form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <input type="text" class="admin-input" name="experience" placeholder="Experience" value="${experience || ''}" />
+                            <input type="text" class="admin-input" name="specialization" placeholder="Specialization" value="${specialization || ''}" />
+                            <input type="text" class="admin-input" name="subjects" placeholder="Subjects Handled" value="${subjects || ''}" />
+                            <input type="text" class="admin-input" name="phone" placeholder="Phone Number" value="${phone || ''}" />
+                            <input type="email" class="admin-input" name="email" placeholder="Email Address" value="${email || ''}" />
+                            <input type="text" class="admin-input" name="achievements" placeholder="Achievements" value="${achievements || ''}" />
+                        </div>
+
+                        <textarea class="admin-textarea" name="description" placeholder="Short Bio / Description">${description || ''}</textarea>
+                    `;
+
+                    // Handle internal upload
+                    const uploadInput = div.querySelector('.faculty-upload');
+                    const uploadBtn = div.querySelector('.upload-btn');
+                    const hiddenInput = div.querySelector('input[name="image_url"]');
+                    const previewImg = div.querySelector('.faculty-img-preview');
+
+                    uploadBtn.onclick = () => uploadInput.click();
+
+                    uploadInput.onchange = (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+
+                        const formData = new FormData();
+                        formData.append('upload', file);
+                        uploadBtn.textContent = 'Uploading...';
+
+                        fetch('/upload-image', {
+                            method: 'POST',
+                            body: formData
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                uploadBtn.textContent = 'Change Photo';
+                                if (data.url) {
+                                    hiddenInput.value = data.url;
+                                    previewImg.src = data.url;
+                                }
+                            })
+                            .catch(err => {
+                                uploadBtn.textContent = 'Change Photo';
+                                alert('Upload failed');
+                            });
+                    };
+
                     facultyListDiv.appendChild(div);
-                    div.querySelector('.removeBtn').addEventListener('click', () => { div.remove(); });
+                    div.querySelector('.removeBtn').addEventListener('click', () => {
+                        if (confirm('Are you sure you want to remove this faculty entry?')) {
+                            div.remove();
+                        }
+                    });
                 }
             });
     }
@@ -471,4 +553,133 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(res => res.json()).then(data => { document.getElementById('forgotMsg').textContent = data.message; });
         });
     }
+    // Homepage Manager (Hybrid: Visual Editor + Slider Manager)
+    function loadHomepageManager() {
+        fetch('/api/homepage')
+            .then(res => res.json())
+            .then(data => {
+                const homepage = data.homepage || {};
+                let galleryImages = [];
+                try {
+                    galleryImages = homepage.gallery_images ? JSON.parse(homepage.gallery_images) : [];
+                } catch (e) { console.error(e); }
+
+                container.innerHTML = injectBackButton(`
+                    <div class="editor-header" style="margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem;">
+                        <h2>🏠 Manage Home Page</h2>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+                        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 2rem; border-radius: 16px; border: 1px solid #bfdbfe;">
+                            <h3 style="color: #1e40af; margin-top: 0;">🎨 Visual Editor</h3>
+                            <p style="color: #60a5fa; margin-bottom: 1.5rem;">Edit text, colors, and layout visually like a pro.</p>
+                            <button onclick="window.location.href='/admin/visual_editor?page=homepage'" style="background: #1e40af; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%;">Launch Editor →</button>
+                        </div>
+                        <div style="background: #f8fafc; padding: 2rem; border-radius: 16px; border: 1px solid #e2e8f0;">
+                            <h3 style="color: #475569; margin-top: 0;">🖼️ Slider Gallery</h3>
+                            <p style="color: #94a3b8; margin-bottom: 1.5rem;">Manage the images in the main slider.</p>
+                            <a href="#sliderForm" style="display: block; text-align: center; color: #475569; padding: 0.75rem; background: white; border-radius: 8px; border: 1px solid #e2e8f0; text-decoration: none; font-weight: 600;">Scroll to Manager ↓</a>
+                        </div>
+                    </div>
+
+                    <h3 id="sliderForm" style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">Slider Images</h3>
+                    <form id="homeGalleryForm">
+                        <div id="galleryList" style="display: grid; gap: 1rem; margin-bottom: 1.5rem;"></div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-bottom: 2rem; align-items: center;">
+                            <input type="text" id="newImgUrl" placeholder="Enter Image URL" style="flex: 1; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px;" />
+                            <span style="color: #94a3b8;">or</span>
+                            <input type="file" id="sliderUpload" style="display: none;" accept="image/*" />
+                            <button type="button" onclick="document.getElementById('sliderUpload').click()" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 0.75rem 1rem; border-radius: 6px; cursor: pointer;">📂 Upload</button>
+                            <button type="button" id="addImgBtn" style="background: #059669; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 6px; cursor: pointer;">+ Add URL</button>
+                        </div>
+
+                        <button type="submit" style="background: #1e40af; color: white; padding: 0.75rem 2.5rem; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Save Gallery</button>
+                    </form>
+                `);
+
+                const list = document.getElementById('galleryList');
+
+                function renderGallery() {
+                    list.innerHTML = '';
+                    galleryImages.forEach((url, index) => {
+                        const div = document.createElement('div');
+                        div.style = "display: flex; align-items: center; gap: 1rem; background: white; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px;";
+                        div.innerHTML = `
+                            <img src="${url}" style="width: 80px; height: 50px; object-fit: cover; border-radius: 4px; background: #eee;" />
+                            <input type="text" value="${url}" readonly style="flex: 1; padding: 0.5rem; border: 1px solid #f1f5f9; background: #f8fafc; color: #64748b; border-radius: 4px;" />
+                            <button type="button" class="del-btn" style="background: #fee2e2; color: #ef4444; border: none; width: 32px; height: 32px; border-radius: 4px; cursor: pointer;">×</button>
+                        `;
+                        div.querySelector('.del-btn').onclick = () => {
+                            galleryImages.splice(index, 1);
+                            renderGallery();
+                        };
+                        list.appendChild(div);
+                    });
+                }
+                renderGallery();
+
+
+                // File Upload handler
+                document.getElementById('sliderUpload').onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const formData = new FormData();
+                    formData.append('upload', file);
+
+                    const btn = e.target.nextElementSibling;
+                    const originalText = btn.textContent;
+                    btn.textContent = '⏳';
+
+                    fetch('/upload-image', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            btn.textContent = originalText;
+                            if (data.url) {
+                                galleryImages.push(data.url);
+                                renderGallery();
+                            } else {
+                                alert('Upload failed');
+                            }
+                        })
+                        .catch(err => {
+                            btn.textContent = originalText;
+                            alert('Error uploading: ' + err);
+                        });
+                };
+
+                document.getElementById('addImgBtn').onclick = () => {
+                    const input = document.getElementById('newImgUrl');
+                    const url = input.value.trim();
+                    if (url) {
+                        galleryImages.push(url);
+                        input.value = '';
+                        renderGallery();
+                    }
+                };
+
+                document.getElementById('homeGalleryForm').onsubmit = (e) => {
+                    e.preventDefault();
+                    // We need to send the FULL homepage object back, slightly awkward API design but works
+                    const newHomepageCore = {
+                        title: homepage.title || '',
+                        subtitle: homepage.subtitle || '',
+                        about: homepage.about || '',
+                        gallery_images: galleryImages
+                    };
+
+                    fetch('/admin/edit/homepage', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ homepage: newHomepageCore })
+                    })
+                        .then(res => { if (res.ok) alert('Gallery updated successfully!'); });
+                };
+            });
+    }
+
 });

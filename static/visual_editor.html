@@ -174,6 +174,13 @@
             display: flex;
             flex-direction: column;
             z-index: 10;
+            transition: width 0.3s ease;
+        }
+
+        .properties-panel.wide {
+            width: 45vw;
+            /* Much wider for code editing */
+            min-width: 500px;
         }
 
         /* Left Library Panel */
@@ -205,6 +212,34 @@
         .tab-btn.active {
             color: var(--primary);
             border-bottom-color: var(--primary);
+        }
+
+        /* Layer Tree CSS */
+        .layer-item {
+            padding: 4px 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            border-radius: 4px;
+        }
+
+        .layer-item:hover {
+            background: #f3f4f6;
+        }
+
+        .layer-item.active {
+            background: #e0e7ff;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .layer-children {
+            padding-left: 12px;
+            border-left: 1px solid #e5e7eb;
+            margin-left: 6px;
         }
 
         .component-item {
@@ -386,6 +421,7 @@
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab('components')">Components</button>
                 <button class="tab-btn" onclick="switchTab('design')">Design</button>
+                <button class="tab-btn" onclick="switchTab('layers')">Layers</button>
             </div>
 
             <div class="panel-content" id="libraryContent">
@@ -404,6 +440,11 @@
                 Properties
                 <span id="selectedTag"
                     style="font-size: 0.8rem; background: #e5e7eb; padding: 2px 6px; border-radius: 4px; color: #6b7280;">None</span>
+            </div>
+
+            <div class="tabs" style="border-bottom: 1px solid #e5e7eb; margin-bottom: 1rem;">
+                <button class="tab-btn active" onclick="switchPropTab('style')" style="flex:1;">Visual</button>
+                <button class="tab-btn" onclick="switchPropTab('code')" style="flex:1;">&lt;/&gt; Code</button>
             </div>
 
             <div class="panel-content" id="propertiesContent">
@@ -435,8 +476,12 @@
             <label class="prop-label">Image Source</label>
             <input type="text" class="prop-input" data-bind="src" readonly style="cursor: pointer;"
                 onclick="triggerImageUpload()" />
-            <button class="btn btn-outline" style="width: 100%; margin-top: 0.5rem;"
-                onclick="triggerImageUpload()">Upload New Image</button>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                <button class="btn btn-outline" style="flex: 1; font-size: 0.8rem;" onclick="triggerImageUpload()">📁
+                    Upload</button>
+                <button class="btn btn-outline" style="flex: 1; font-size: 0.8rem;" onclick="openStockModal()">🔍
+                    Stock</button>
+            </div>
         </div>
         <div class="prop-group">
             <label class="prop-label">Alt Text</label>
@@ -444,9 +489,97 @@
         </div>
     </template>
 
+    <!-- Stock Image Modal -->
+    <div id="stockModal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center;">
+        <div
+            style="background: white; width: 600px; height: 500px; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <div
+                style="padding: 1rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0;">Select Stock Photo</h3>
+                <button onclick="closeStockModal()"
+                    style="border: none; background: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            <div style="padding: 1rem;">
+                <input type="text" id="stockSearch" placeholder="Search photos (e.g. campus, library)..."
+                    style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 1rem;"
+                    onkeyup="filterStockPhotos(this.value)" />
+            </div>
+            <div id="stockGrid"
+                style="flex: 1; overflow-y: auto; padding: 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                <!-- Images injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <template id="typography-props-template">
+        <div class="prop-group">
+            <label class="prop-label">Typography</label>
+            <div class="prop-row">
+                <select class="prop-input" data-bind="fontFamily">
+                    <option value="Inter, sans-serif">Inter</option>
+                    <option value="'Roboto', sans-serif">Roboto</option>
+                    <option value="'Open Sans', sans-serif">Open Sans</option>
+                    <option value="'Playfair Display', serif">Playfair Display</option>
+                    <option value="monospace">Monospace</option>
+                </select>
+            </div>
+            <div class="prop-row" style="margin-top: 0.5rem;">
+                <input type="number" class="prop-input" placeholder="Size" data-bind="fontSize" style="width: 50%" />
+                <select class="prop-input" data-bind="fontWeight" style="width: 50%">
+                    <option value="400">Regular</option>
+                    <option value="500">Medium</option>
+                    <option value="600">SemiBold</option>
+                    <option value="700">Bold</option>
+                </select>
+            </div>
+            <div class="prop-row" style="margin-top: 0.5rem;">
+                <input type="color" data-bind="color"
+                    style="width: 30px; height: 30px; border: none; background: none;" />
+                <select class="prop-input" data-bind="textAlign" style="flex: 1;">
+                    <option value="left">Left</option>
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                </select>
+            </div>
+        </div>
+    </template>
+
+    <template id="spacing-props-template">
+        <div class="prop-group">
+            <label class="prop-label">Spacing (Padding / Margin)</label>
+            <div class="prop-row">
+                <span style="font-size: 0.8rem; color: #6b7280; width: 40px;">Pad</span>
+                <input type="range" min="0" max="100" class="prop-input" data-bind="padding" />
+                <span class="value-display" data-bind="paddingVal" style="font-size: 0.7rem; width: 30px;">0px</span>
+            </div>
+            <div class="prop-row" style="margin-top: 0.5rem;">
+                <span style="font-size: 0.8rem; color: #6b7280; width: 40px;">Mar</span>
+                <input type="range" min="0" max="100" class="prop-input" data-bind="margin" />
+                <span class="value-display" data-bind="marginVal" style="font-size: 0.7rem; width: 30px;">0px</span>
+            </div>
+        </div>
+    </template>
+
+    <template id="effects-props-template">
+        <div class="prop-group">
+            <label class="prop-label">Effects</label>
+            <div class="prop-row">
+                <span style="font-size: 0.8rem; color: #6b7280;">Radius</span>
+                <input type="number" class="prop-input" data-bind="borderRadius" placeholder="0" />
+                <span style="font-size: 0.7rem;">px</span>
+            </div>
+            <div class="prop-row" style="margin-top: 0.5rem; align-items: center;">
+                <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" data-bind="boxShadow" /> Drop Shadow
+                </label>
+            </div>
+        </div>
+    </template>
+
     <template id="bg-props-template">
         <div class="prop-group">
-            <label class="prop-label">Background Color</label>
+            <label class="prop-label">Background</label>
             <div class="color-picker-wrapper">
                 <input type="color" data-bind="backgroundColor" />
                 <input type="text" class="prop-input" style="border:none; padding: 0.2rem;" data-bind="bgColorText" />

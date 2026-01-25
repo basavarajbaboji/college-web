@@ -114,7 +114,7 @@ def init_db():
         # Migration for faculty columns
         cursor.execute("PRAGMA table_info(faculty)")
         faculty_columns = [col[1] for col in cursor.fetchall()]
-        for col in ['qualification', 'experience', 'specialization', 'achievements', 'subjects']:
+        for col in ['qualification', 'experience', 'specialization', 'achievements', 'subjects', 'branch', 'image_url']:
             if col not in faculty_columns:
                 cursor.execute(f'ALTER TABLE faculty ADD COLUMN {col} TEXT')
 
@@ -137,9 +137,24 @@ def init_db():
                 id INTEGER PRIMARY KEY CHECK (id = 1),
                 title TEXT NOT NULL,
                 subtitle TEXT,
-                about TEXT
+                about TEXT,
+                gallery_images TEXT
             )
         ''')
+        
+        # Migration for homepage gallery_images
+        cursor.execute("PRAGMA table_info(homepage)")
+        hp_columns = [col[1] for col in cursor.fetchall()]
+        if 'gallery_images' not in hp_columns:
+            cursor.execute('ALTER TABLE homepage ADD COLUMN gallery_images TEXT')
+            # Set default images
+            default_images = json.dumps([
+                "https://imgs.search.brave.com/9xAZEA1ObMq2GHjKL3_Tu41hB7fbltuQqB_MnNWF-Yc/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTQ4/MzI3Mjc5Ni9waG90/by9zZW1pbmFyLWNv/ZGluZy10YWxraW5n/LmpwZz9zPTYxMng2/MTImdz0wJms9MjAm/Yz0xVDRXVk9JX1J6/UGFRQkF5QzF6MDJo/UjBjeWNBcDJSZ2JB/UzJfRW9pZm5FPQ",
+                "https://imgs.search.brave.com/xHmkH2VnPu3TcLbKfY-obHe8FU6A2YL6-5agMx7Uey0/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE1/MjIwNzE4MjAwODEt/MDA5ZjAxMjljNzFj/P2ZtPWpwZyZxPTYw/Jnc9MzAwMCZpeGxp/Yj1yYi00LjEuMCZp/eGlkPU0zd3hNakEz/ZkRCOE1IeHpaV0Z5/WTJoOE1UWjhmR052/Ykd4bFoyVWxNakJ6/ZEhWa1pXNTBjM3hs/Ym53d2ZId3dmSHg4/TUE9PQ",
+                "https://imgs.search.brave.com/Zu3XdD1LcPTt2IbbJ5X0zzWPVeFULoHH1Grk94DilVE/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzA2LzcyLzg4Lzgy/LzM2MF9GXzY3Mjg4/ODI2MV94NjFveXYz/STV0UzdoakFRd251/U2VXUHdKNzVXYU1q/RS5qcGc"
+            ])
+            cursor.execute('UPDATE homepage SET gallery_images = ? WHERE id = 1', (default_images,))
+
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS applications (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -190,10 +205,15 @@ def init_db():
         # Default homepage content
         cursor.execute('SELECT * FROM homepage WHERE id = 1')
         if cursor.fetchone() is None:
+            default_imgs = json.dumps([
+                "https://imgs.search.brave.com/9xAZEA1ObMq2GHjKL3_Tu41hB7fbltuQqB_MnNWF-Yc/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTQ4/MzI3Mjc5Ni9waG90/by9zZW1pbmFyLWNv/ZGluZy10YWxraW5n/LmpwZz9zPTYxMng2/MTImdz0wJms9MjAm/Yz0xVDRXVk9JX1J6/UGFRQkF5QzF6MDJo/UjBjeWNBcDJSZ2JB/UzJfRW9pZm5FPQ",
+                "https://imgs.search.brave.com/xHmkH2VnPu3TcLbKfY-obHe8FU6A2YL6-5agMx7Uey0/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE1/MjIwNzE4MjAwODEt/MDA5ZjAxMjljNzFj/P2ZtPWpwZyZxPTYw/Jnc9MzAwMCZpeGxp/Yj1yYi00LjEuMCZp/eGlkPU0zd3hNakEz/ZkRCOE1IeHpaV0Z5/WTJoOE1UWjhmR052/Ykd4bFoyVWxNakJ6/ZEhWa1pXNTBjM3hs/Ym53d2ZId3dmSHg4/TUE9PQ",
+                "https://imgs.search.brave.com/Zu3XdD1LcPTt2IbbJ5X0zzWPVeFULoHH1Grk94DilVE/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzA2LzcyLzg4Lzgy/LzM2MF9GXzY3Mjg4/ODI2MV94NjFveXYz/STV0UzdoakFRd251/U2VXUHdKNzVXYU1q/RS5qcGc"
+            ])
             cursor.execute('''
-                INSERT INTO homepage (id, title, subtitle, about)
-                VALUES (1, 'Welcome to Government Polytechnic College Hole Alur', 'Empowering future engineers with innovative education', 'Our mission is to provide quality technical education and foster innovation. We offer various diploma programs in engineering and technology, preparing students for successful careers in the industry.')
-            ''')
+                INSERT INTO homepage (id, title, subtitle, about, gallery_images)
+                VALUES (1, 'Welcome to Government Polytechnic College Hole Alur', 'Empowering future engineers with innovative education', 'Our mission is to provide quality technical education and foster innovation. We offer various diploma programs in engineering and technology, preparing students for successful careers in the industry.', ?)
+            ''', (default_imgs,))
 
         # Sample branches initialization / update
         branches_data = [
@@ -402,8 +422,8 @@ def admin_edit_section(section):
             cursor.execute('DELETE FROM faculty')
             for f in faculty:
                 cursor.execute('''
-                    INSERT INTO faculty (name, phone, email, role, description, qualification, experience, specialization, achievements, subjects)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (f['name'], f.get('phone'), f.get('email'), f['role'], f.get('description'), f.get('qualification'), f.get('experience'), f.get('specialization'), f.get('achievements'), f.get('subjects')))
+                    INSERT INTO faculty (name, phone, email, role, description, qualification, experience, specialization, achievements, subjects, branch, image_url)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (f['name'], f.get('phone'), f.get('email'), f['role'], f.get('description'), f.get('qualification'), f.get('experience'), f.get('specialization'), f.get('achievements'), f.get('subjects'), f.get('branch'), f.get('image_url')))
             db.commit()
             return "Faculty updated successfully"
 
@@ -430,9 +450,13 @@ def admin_edit_section(section):
         elif section == 'homepage':
             homepage = data.get('homepage')
             if not homepage: return "Invalid data", 400
+            
+            # Serialize gallery_images
+            gallery_images = json.dumps(homepage.get('gallery_images', []))
+            
             cursor.execute('DELETE FROM homepage')
-            cursor.execute('INSERT INTO homepage (id, title, subtitle, about) VALUES (1, ?, ?, ?)',
-                           (homepage.get('title'), homepage.get('subtitle'), homepage.get('about')))
+            cursor.execute('INSERT INTO homepage (id, title, subtitle, about, gallery_images) VALUES (1, ?, ?, ?, ?)',
+                           (homepage.get('title'), homepage.get('subtitle'), homepage.get('about'), gallery_images))
             db.commit()
             return "Homepage updated successfully"
 
@@ -526,6 +550,31 @@ def get_styles():
             pass
             
     return jsonify(styles)
+
+@app.route('/api/save_html', methods=['POST'])
+def save_html():
+    if 'admin_logged_in' not in session:
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    data = request.json
+    page = data.get('page')
+    content = data.get('content')
+    
+    if not page or not content:
+        return jsonify({"error": "Missing data"}), 400
+        
+    # Security check: only allow specific static files
+    allowed_pages = ['index.html', 'branches.html', 'faculty.html', 'admissions.html', 'contact.html']
+    if page not in allowed_pages:
+        return jsonify({"error": "Invalid page"}), 400
+        
+    try:
+        filepath = os.path.join(app.static_folder, page)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(content)
+        return jsonify({"message": "Content saved successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/admin/change_credentials', methods=['POST'])
 def change_credentials():

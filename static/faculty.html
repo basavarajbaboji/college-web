@@ -11,40 +11,33 @@
 
 <body>
     <header>
-        <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h1 style="margin: 0;">Government Polytechnic College Hole Alur</h1>
-                <nav style="position: relative;">
-                    <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
-                    <ul class="nav-links" id="navLinks">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="branches.html">Branches</a></li>
-                        <li><a href="admissions.html">Admissions</a></li>
-                        <li><a href="faculty.html" aria-current="page">Faculty</a></li>
-                        <li><a href="student_details.html">Student Details</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
-                        <li><a href="admin.html">Admin</a></li>
-                    </ul>
-                </nav>
-            </div>
+        <div class="container" style="position: relative;">
+            <h1>Government Polytechnic College Hole Alur</h1>
+            <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+            <nav>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="branches.html">Branches</a></li>
+                    <li><a href="admissions.html">Admissions</a></li>
+                    <li><a href="faculty.html" aria-current="page">Faculty</a></li>
+                    <li><a href="student_details.html">Student Details</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="admin.html">Admin</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
     <main>
-        <section id="faculty" class="section">
+        <section class="section faculty-section">
             <div class="container">
-                <h2>👨‍🏫 Our Faculty</h2>
-                <p style="text-align: center; color: var(--gray-600); max-width: 800px; margin: 0 auto 2rem;">
-                    Our faculty comprises experienced educators and industry professionals dedicated to providing
-                    quality education and mentorship to our students.
-                </p>
+                <h2 style="margin-bottom: 3rem;">👨‍🏫 Our Faculty</h2>
 
-                <ul class="faculty-list" id="facultyList">
-                    <li>
-                        <h3>Loading faculty data...</h3>
-                        <p>Please wait while we fetch the latest information.</p>
-                    </li>
-                </ul>
+                <div id="facultyContainer">
+                    <div style="text-align: center; padding: 3rem;">
+                        <p>Loading faculty dimensions...</p>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -55,51 +48,206 @@
         </div>
     </footer>
 
+    <!-- Modal Structure -->
+    <div id="facultyModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
     <script src="script.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const facultyList = document.getElementById('facultyList');
+            console.log("Faculty script loaded.");
+            const container = document.getElementById('facultyContainer');
+
+            // Global storage for faculty data to avoid HTML attribute quoting hell
+            window.allFacultyData = [];
+
+            function renderError(msg) {
+                container.innerHTML = `<div style="text-align: center; color: red; padding: 2rem;">
+                    <h3>⚠️ Error Loading Faculty</h3>
+                    <p>${msg}</p>
+                </div>`;
+            }
 
             fetch('/api/faculty_details')
                 .then(response => {
-                    if (!response.ok) throw new Error('Failed to fetch');
+                    if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
                 })
                 .then(data => {
-                    const facultyMembers = data.faculty || [];
-
-                    if (facultyMembers.length === 0) {
-                        facultyList.innerHTML = '<li><h3>No faculty data available.</h3></li>';
+                    const faculty = data.faculty || [];
+                    if (faculty.length === 0) {
+                        container.innerHTML = '<p style="text-align: center;">No faculty data available.</p>';
                         return;
                     }
 
-                    facultyList.innerHTML = '';
-                    facultyMembers.forEach((member, index) => {
-                        const li = document.createElement('li');
-                        li.style.animationDelay = `${index * 0.1}s`;
-                        li.innerHTML = `
-                            <div class="faculty-card" style="background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); transition: transform 0.3s, box-shadow 0.3s;">
-                                <h3 style="margin-top: 0; color: var(--primary-blue); display: flex; align-items: center; gap: 0.5rem;" data-db-field="name" data-db-index="${index}">👤 ${member.name}</h3>
-                                <p style="margin-bottom: 0.5rem;"><strong>🎯 Role:</strong> <span style="color: var(--accent-purple); font-weight: 600;" data-db-field="role" data-db-index="${index}">${member.role || 'N/A'}</span></p>
-                                <p style="margin-bottom: 0.5rem;"><strong>🎓 Qualification:</strong> <span data-db-field="qualification" data-db-index="${index}">${member.qualification || 'N/A'}</span></p>
-                                <p style="margin-bottom: 0.5rem;"><strong>⏳ Experience:</strong> <span data-db-field="experience" data-db-index="${index}">${member.experience || 'N/A'}</span></p>
-                                <p style="margin-bottom: 0.5rem;"><strong>🔬 Specialization:</strong> <span style="color: var(--primary-blue);" data-db-field="specialization" data-db-index="${index}">${member.specialization || 'General Engineering'}</span></p>
-                                <p style="margin-bottom: 0.5rem;"><strong>📚 Subjects Handled:</strong> <span style="color: var(--accent-orange); font-style: italic;" data-db-field="subjects" data-db-index="${index}">${member.subjects || 'Core Engineering Subjects'}</span></p>
-                                <p style="margin-bottom: 0.5rem;"><strong>🏆 Achievements:</strong> <span data-db-field="achievements" data-db-index="${index}">${member.achievements || 'Distinguished Academician'}</span></p>
-                                <p style="margin-bottom: 0.5rem;"><strong>📝 About:</strong> <span data-db-field="description" data-db-index="${index}">${member.description || 'N/A'}</span></p>
-                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-100); display: flex; flex-wrap: wrap; gap: 1rem;">
-                                    <span><strong>📞 Phone:</strong> <span data-db-field="phone" data-db-index="${index}">${member.phone || 'N/A'}</span></span>
-                                    <span><strong>📧 Email:</strong> <a href="mailto:${member.email}" style="color: var(--primary-blue); text-decoration: none;" data-db-field="email" data-db-index="${index}">${member.email || 'N/A'}</a></span>
+                    // Store data globally for easy access by modal
+                    window.allFacultyData = faculty;
+
+                    console.log('Faculty Data loaded:', faculty.length);
+
+                    // 1. Separate Principal (Safely)
+                    const principal = faculty.find(f => f.role && f.role.toLowerCase().includes('principal'));
+                    const others = faculty.filter(f => !f.role || !f.role.toLowerCase().includes('principal'));
+
+                    // 2. Group others by Branch
+                    const groups = {};
+                    others.forEach(f => {
+                        const branch = f.branch || 'Other Staff';
+                        if (!groups[branch]) groups[branch] = [];
+                        groups[branch].push(f);
+                    });
+
+                    // 3. Sorting logic
+                    for (const branch in groups) {
+                        groups[branch].sort((a, b) => {
+                            const roleA = (a.role || '').toLowerCase();
+                            const roleB = (b.role || '').toLowerCase();
+                            const isAHod = roleA.includes('hod') || roleA.includes('head');
+                            const isBHod = roleB.includes('hod') || roleB.includes('head');
+                            if (isAHod && !isBHod) return -1;
+                            if (!isAHod && isBHod) return 1;
+                            return 0;
+                        });
+                    }
+
+                    // Start Rendering
+                    let html = '';
+
+                    if (principal) {
+                        // Find original index in the global array
+                        const pIndex = faculty.indexOf(principal);
+                        html += `
+                            <div class="principal-container">
+                                <div class="principal-card">
+                                    ${createFacultyCard(principal, pIndex, 'principal')}
                                 </div>
                             </div>
                         `;
-                        facultyList.appendChild(li);
+                    }
+
+                    const branchOrder = [
+                        'Computer Science Engineering',
+                        'Electrical and Electronics Engineering',
+                        'Electronics and Communication Engineering',
+                        'Mechanical Engineering',
+                        'Non-Teaching',
+                        'Other Staff'
+                    ];
+
+                    const existingBranches = Object.keys(groups);
+
+                    branchOrder.forEach(branchName => {
+                        if (groups[branchName] && groups[branchName].length > 0) {
+                            html += renderBranchGroup(branchName, groups[branchName]);
+                        }
                     });
+
+                    existingBranches.forEach(branchName => {
+                        if (!branchOrder.includes(branchName) && groups[branchName].length > 0) {
+                            html += renderBranchGroup(branchName, groups[branchName]);
+                        }
+                    });
+
+                    container.innerHTML = html;
                 })
-                .catch(error => {
-                    console.error(error);
-                    facultyList.innerHTML = '<li><h3 style="color: var(--accent-orange);">Failed to load faculty data.</h3></li>';
+                .catch(err => {
+                    console.error(err);
+                    renderError(err.message);
                 });
+
+            function renderBranchGroup(name, members) {
+                const icon = name.includes('Computer') ? '💻' :
+                    name.includes('Electrical') ? '⚡' :
+                        name.includes('Electronics') ? '📡' :
+                            name.includes('Mechanical') ? '⚙️' : '👥';
+
+                // Map members to their chunks to find original indices
+                const cardsHtml = members.map(m => {
+                    const idx = window.allFacultyData.indexOf(m);
+                    return `<li>${createFacultyCard(m, idx)}</li>`;
+                }).join('');
+
+                return `
+                    <div class="branch-group">
+                        <div class="branch-header">${icon} ${name}</div>
+                        <ul class="faculty-grid">
+                            ${cardsHtml}
+                        </ul>
+                    </div>
+                `;
+            }
+
+
+
+            function createFacultyCard(m, index, extraClass = '') {
+                // No complex encoding! Just pass the index.
+                return `
+                    <div class="faculty-card ${extraClass}">
+                        <div class="faculty-image-container">
+                            <img src="${m.image_url || '/placeholder-avatar.png'}" onerror="this.src='https://via.placeholder.com/150?text=${encodeURIComponent(m.name)}'" alt="${m.name}">
+                        </div>
+                        <div class="faculty-info">
+                            <h3 class="faculty-name">${m.name}</h3>
+                            <div class="faculty-role">${m.role || 'Faculty'}</div>
+                            <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">${m.qualification || ''}</p>
+                        </div>
+                        
+                        <button class="view-profile-btn" onclick="openModal(${index})">View Profile</button>
+                    </div>
+                `;
+            }
+
+            // Modal Functions
+            window.openModal = function (index) {
+                const m = window.allFacultyData[index];
+                if (!m) return;
+
+                const modal = document.getElementById('facultyModal');
+                const body = document.getElementById('modalBody');
+
+                body.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                         <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin: 0 auto 1rem; border: 3px solid var(--gray-100);">
+                            <img src="${m.image_url || '/placeholder-avatar.png'}" onerror="this.src='https://via.placeholder.com/150?text=${encodeURIComponent(m.name)}'" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <h2 style="color: var(--primary-blue); margin-bottom: 0.25rem;">${m.name}</h2>
+                        <h4 style="color: var(--accent-purple); text-transform: uppercase; letter-spacing: 1px;">${m.role || ''}</h4>
+                        <p style="color: var(--gray-600);">${m.qualification || ''}</p>
+                    </div>
+
+                    <div style="display: grid; gap: 1rem; border-top: 1px solid var(--gray-100); padding-top: 1.5rem;">
+                         ${m.description ? `<p><strong>📝 About:</strong><br>${m.description}</p>` : ''}
+                         <p><strong>🎯 Specialization:</strong> ${m.specialization || 'N/A'}</p>
+                         <p><strong>📚 Subjects:</strong> ${m.subjects || 'N/A'}</p>
+                         <p><strong>⏳ Experience:</strong> ${m.experience || 'N/A'}</p>
+                         <p><strong>🏆 Achievements:</strong> ${m.achievements || 'N/A'}</p>
+                         <div style="display: flex; gap: 1.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-100);">
+                            <span><strong>📧 Email:</strong> <a href="mailto:${m.email}">${m.email || 'N/A'}</a></span>
+                            ${m.phone ? `<span><strong>📞 Phone:</strong> ${m.phone}</span>` : ''}
+                         </div>
+                    </div>
+                `;
+
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            window.closeModal = function () {
+                const modal = document.getElementById('facultyModal');
+                if (modal) modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // Close on outside click
+            document.getElementById('facultyModal').addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay')) {
+                    closeModal();
+                }
+            });
         });
     </script>
 </body>

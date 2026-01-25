@@ -101,13 +101,23 @@ function initGallery() {
     }
 
     // Event listeners
-    prevBtn.addEventListener('click', () => {
+    // Clone buttons to remove existing listeners (prevent duplicate bindings on re-init)
+    const newPrev = prevBtn.cloneNode(true);
+    const newNext = nextBtn.cloneNode(true);
+    prevBtn.parentNode.replaceChild(newPrev, prevBtn);
+    nextBtn.parentNode.replaceChild(newNext, nextBtn);
+
+    // Re-assign to use the new elements
+    const activePrev = newPrev;
+    const activeNext = newNext;
+
+    activePrev.addEventListener('click', () => {
         stopAutoPlay();
         prevImage();
         startAutoPlay();
     });
 
-    nextBtn.addEventListener('click', () => {
+    activeNext.addEventListener('click', () => {
         stopAutoPlay();
         nextImage();
         startAutoPlay();
@@ -171,8 +181,9 @@ function initMobileMenu() {
 
     menuToggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        navLinks.classList.toggle('show');
-        menuToggle.innerHTML = navLinks.classList.contains('show') ? '✕' : '☰';
+        const isOpen = navLinks.classList.toggle('show');
+        menuToggle.innerHTML = isOpen ? '✕' : '☰';
+        // Removed body scroll lock for dropdown behavior
     });
 
     // Close menu when clicking outside
@@ -387,5 +398,6 @@ function animateCounter(element, target, duration = 2000) {
 
 // Expose utility functions globally
 window.CollegeUI = {
-    animateCounter
+    animateCounter,
+    initGallery
 };
