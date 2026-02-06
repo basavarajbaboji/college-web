@@ -36,6 +36,50 @@
                     Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
                 </p>
 
+                <!-- NEW: Track Application Section -->
+                <div class="tracking-card section"
+                    style="margin-bottom: 3rem; background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-left: 5px solid var(--primary-blue);">
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <h3
+                            style="color: var(--primary-blue); font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            🔍 Track Your Application Status
+                        </h3>
+                        <p style="font-size: 0.9rem; color: var(--gray-600);">Enter your details to check your admission
+                            progress.</p>
+                    </div>
+
+                    <form id="trackForm"
+                        style="max-width: 800px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; padding: 1.5rem; background: white; border-radius: 12px; box-shadow: var(--shadow-sm);">
+                        <div style="margin-bottom: 0;">
+                            <label for="track_app_no" style="font-weight: 600;">Application Number <span
+                                    style="color: red;">*</span></label>
+                            <input type="text" id="track_app_no" name="app_no" placeholder="e.g. GPC-HA-..." required
+                                style="margin-bottom: 0;" />
+                        </div>
+                        <div style="margin-bottom: 0;">
+                            <label for="track_name" style="font-weight: 600;">Applicant Name <span
+                                    style="color: red;">*</span></label>
+                            <input type="text" id="track_name" name="name" placeholder="As per application" required
+                                style="margin-bottom: 0;" />
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button type="submit" style="width: 100%; height: 48px; margin-bottom: 0;">Check Status
+                                →</button>
+                        </div>
+                    </form>
+
+                    <div id="trackResult" style="margin-top: 1.5rem; display: none;">
+                        <!-- Results will be injected here -->
+                    </div>
+                </div>
+
+                <div class="section-divider"
+                    style="height: 1px; background: var(--gray-200); margin: 3rem 0; position: relative; text-align: center;">
+                    <span
+                        style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: white; padding: 0 1rem; color: var(--gray-400); font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase;">Or
+                        Send Us a Message</span>
+                </div>
+
                 <form id="contactForm">
                     <div style="margin-bottom: 1rem;">
                         <label for="name">Your Name</label>
@@ -138,6 +182,73 @@
     </footer>
 
     <script src="script.js" defer></script>
+    <script>
+        // Track Application Submission
+        document.getElementById('trackForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const resultDiv = document.getElementById('trackResult');
+            const submitBtn = this.querySelector('button');
+            const originalText = submitBtn.textContent;
+
+            // Show loading
+            submitBtn.textContent = 'Searching...';
+            submitBtn.disabled = true;
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="text-align: center; padding: 1rem;">⏳ Querying database...</div>';
+
+            try {
+                const response = await fetch('/api/track_application', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        app_no: document.getElementById('track_app_no').value,
+                        name: document.getElementById('track_name').value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    let statusColor = '#3b82f6'; // Blue for pending
+                    let statusIcon = '⏳';
+
+                    if (data.status === 'Verified') {
+                        statusColor = '#059669'; // Green
+                        statusIcon = '✅';
+                    } else if (data.status === 'Rejected') {
+                        statusColor = '#dc2626'; // Red
+                        statusIcon = '❌';
+                    }
+
+                    resultDiv.innerHTML = `
+                        <div style="padding: 1.5rem; background: white; border-radius: 12px; border: 2px solid ${statusColor}; animation: slideDown 0.3s ease-out;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                                <div>
+                                    <h4 style="margin: 0; color: var(--gray-700);">Application for: <span style="color: var(--primary-blue);">${data.name}</span></h4>
+                                    <p style="margin: 5px 0 0; font-size: 0.9rem; color: var(--gray-500);">Course: ${data.course}</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.75rem; background: ${statusColor}10; padding: 0.75rem 1.25rem; border-radius: 50px; border: 1px solid ${statusColor}30;">
+                                    <span style="font-size: 1.2rem;">${statusIcon}</span>
+                                    <span style="font-weight: 700; color: ${statusColor}; text-transform: uppercase; letter-spacing: 1px;">${data.status}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="padding: 1rem; background: #fff1f2; border-radius: 12px; border: 1px solid #fda4af; text-align: center; color: #be123c;">
+                            ⚠️ ${data.error}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div style="color: red; text-align: center;">✗ Server error. Please try again later.</div>';
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 
 </html>

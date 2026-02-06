@@ -130,10 +130,10 @@
                     }
 
                     const branchOrder = [
+                        'Artificial Intelligence',
                         'Computer Science Engineering',
                         'Electrical and Electronics Engineering',
                         'Electronics and Communication Engineering',
-                        'Mechanical Engineering',
                         'Non-Teaching',
                         'Other Staff'
                     ];
@@ -160,10 +160,10 @@
                 });
 
             function renderBranchGroup(name, members) {
-                const icon = name.includes('Computer') ? '💻' :
-                    name.includes('Electrical') ? '⚡' :
-                        name.includes('Electronics') ? '📡' :
-                            name.includes('Mechanical') ? '⚙️' : '👥';
+                const icon = name.includes('Artificial') ? '🧠' :
+                    name.includes('Computer') ? '💻' :
+                        name.includes('Electrical') ? '⚡' :
+                            name.includes('Electronics') ? '📡' : '👥';
 
                 // Map members to their chunks to find original indices
                 const cardsHtml = members.map(m => {

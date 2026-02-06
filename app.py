@@ -12,8 +12,9 @@ from werkzeug.utils import secure_filename
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 # IMPORTANT: Use environment variables or a config file for these in production
-EMAIL_ADDRESS = os.environ.get('EMAIL_USER', 'your-email@gmail.com')
-EMAIL_PASSWORD = os.environ.get('EMAIL_PASS', 'your-app-password')
+# For Gmail, you MUST use an "App Password" (https://myaccount.google.com/apppasswords)
+EMAIL_ADDRESS = os.environ.get('EMAIL_USER', 'basavarajbabojiganoji@gmail.com')
+EMAIL_PASSWORD = os.environ.get('EMAIL_PASS', 'lsgx lhdi lhvp hqmw')
 ADMIN_EMAIL = "bm4248757@gmail.com"
 
 app = Flask(__name__, static_folder='static', static_url_path='')
@@ -269,32 +270,7 @@ def init_db():
                 60,
                 'VLSI Design Lab, Embedded Systems Workshop, Communication Systems Lab'
             ),
-            (
-                'Mechanical Engineering', 
-                'Learn the principles of thermodynamics, robotics, advanced materials, and precise mechanical design.', 
-                'Nanobotics for precision surgery, 4D printing of adaptive materials, and hyperloop transportation infrastructure.', 
-                'Driving innovation in Tesla-style aerospace manufacturing, sophisticated robotics in logistics, and high-efficiency thermal management for data centers.', 
-                'Robotics Engineer, Aerospace Design Analyst, Manufacturing Systems Manager, Thermal Engineer, CAD/CAM Specialist.',
-                'Thermodynamics, Fluid Mechanics, Manufacturing Technology, Kinematics of Machinery, Heat Transfer, Robotics & CAD.',
-                'Computer-Aided Design (CAD), Thermal Analysis, Robot Programming, CNC Operations, Structural Mechanics, Advanced Manufacturing.',
-                'SSLC/10th Pass with 35% aggregate.',
-                '3 Years (6 Semesters)',
-                60,
-                'Robotics & Automation Lab, Advanced Thermal Engineering Lab, CAD/CAM Design Studio'
-            ),
-            (
-                'Civil Engineering', 
-                'Study the design and construction of resilient infrastructure, smart cities, sustainable architecture, and structural engineering.', 
-                '3D-printed sustainable housing, self-healing concrete, and the engineering of climate-resilient floating cities.', 
-                'At the forefront of building modern smart-city infrastructures, high-speed rail networks, and sustainable green buildings with zero carbon footprint.', 
-                'Urban Planner, Structural Engineer, Sustainable Design Consultant, Transportation Infrastructure Lead, Geo-technical Analyst.',
-                'Structural Analysis, Construction Technology, Environmental Engineering, Transportation Engineering, Surveying, GIS & Remote Sensing.',
-                'BIM (Building Information Modeling), Structural Design, Project Management, Land Surveying, GIS Analysis, Environmental Assessment.',
-                'SSLC/10th Pass with 35% aggregate.',
-                '3 Years (6 Semesters)',
-                40,
-                'Structural Engineering Lab, GIS & Surveying Centre, Fluid Mechanics Lab'
-            )
+
         ]
         
         for name, desc, tech, usage, career, subjects, skills, eligibility, duration, intake, labs in branches_data:
@@ -667,8 +643,37 @@ def submit_contact():
 
     return jsonify({"message": "Thank you! We'll get back to you soon."}), 200
 
+@app.route('/api/track_application', methods=['POST'])
+def track_application():
+    data = request.json
+    app_no = data.get('app_no')
+    name = data.get('name')
+
+    if not app_no or not name:
+        return jsonify({"error": "Application number and name are required."}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('''
+        SELECT candidate_name, status, preference1 
+        FROM applications 
+        WHERE app_no = ? AND LOWER(candidate_name) = LOWER(?)
+    ''', (app_no, name))
+    
+    application = cursor.fetchone()
+    
+    if application:
+        return jsonify({
+            "name": application['candidate_name'],
+            "status": application['status'],
+            "course": application['preference1']
+        }), 200
+    else:
+        return jsonify({"error": "No application found with these details. Please check your Application Number and Name."}), 404
+
+
 def send_email(subject, body, files=None):
-    if not EMAIL_ADDRESS or not EMAIL_PASSWORD or EMAIL_ADDRESS == 'your-email@gmail.com':
+    if not EMAIL_ADDRESS or not EMAIL_PASSWORD or EMAIL_ADDRESS == 'your-email@gmail.com' or 'your-app-password' in EMAIL_PASSWORD:
         print("Email configuration missing. Skipping email send.")
         return
 
@@ -680,11 +685,19 @@ def send_email(subject, body, files=None):
     msg.attach(MIMEText(body, 'plain'))
 
     if files:
-        for filename, file_data in files.items():
-            attachment = MIMEApplication(file_data.read(), _subtype=filename.split('.')[-1])
-            attachment.add_header('Content-Disposition', 'attachment', filename=filename)
-            msg.attach(attachment)
-            file_data.seek(0) # Reset file pointer for other uses if needed
+        for key, file_storage in files.items():
+            if file_storage and file_storage.filename:
+                try:
+                    file_content = file_storage.read()
+                    if not file_content:
+                        continue
+                        
+                    attachment = MIMEApplication(file_content)
+                    attachment.add_header('Content-Disposition', 'attachment', filename=file_storage.filename)
+                    msg.attach(attachment)
+                    file_storage.seek(0)
+                except Exception as e:
+                    print(f"Error attaching file {key}: {e}")
 
     try:
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
@@ -695,6 +708,8 @@ def send_email(subject, body, files=None):
     except Exception as e:
         print(f"Failed to send email: {e}")
         raise e
+
+
 
 @app.route('/api/submit_application', methods=['POST'])
 def submit_application():
@@ -759,10 +774,11 @@ def submit_application():
         # Send Email
         subject = f"New Admission Application: {name} ({app_no})"
         try:
-             # attachments not implemented for now to avoid complexity with saved files
-            send_email(subject, body) 
-        except:
-            pass # Don't block submission if email fails
+            # We pass request.files which contains the uploaded documents
+            send_email(subject, body, files=request.files) 
+        except Exception as e:
+            print(f"Email notification failed: {e}")
+            # Don't block submission if email fails
 
         return jsonify({
             "message": "Application submitted successfully",
@@ -829,6 +845,23 @@ def update_application_status():
     db.commit()
     return jsonify({"message": f"Status updated to {status}"})
 
+@app.route('/api/admin/application/delete', methods=['POST'])
+def delete_application():
+    if not session.get('admin_logged_in'):
+        return "Unauthorized", 401
+    
+    data = request.json
+    app_no = data.get('app_no')
+    
+    if not app_no:
+        return "Invalid data", 400
+        
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('DELETE FROM applications WHERE app_no = ?', (app_no,))
+    db.commit()
+    return jsonify({"message": f"Application {app_no} deleted successfully"})
+
 @app.route('/api/homepage', methods=['GET'])
 def get_homepage():
     db = get_db()
@@ -838,4 +871,4 @@ def get_homepage():
     return jsonify({'homepage': dict(row) if row else {}})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
